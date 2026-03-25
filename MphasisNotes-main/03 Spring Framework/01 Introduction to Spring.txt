@@ -1,0 +1,330 @@
+
+# 1. Introduction – Overview of Spring Technology
+
+Spring is a **lightweight, open-source, enterprise Java framework** for building loosely coupled applications.
+
+It was created to:
+
+* Reduce complexity of Java EE development
+* Remove boilerplate configuration
+* Promote loose coupling
+* Make applications testable
+
+👉 Core idea: *Let the framework manage objects, not us.*
+
+---
+
+# 2. The Motivation for Spring
+
+Before Spring:
+
+* Heavy XML configuration (EJB)
+* Tight coupling
+* Hard-to-test code
+* Complex container setup
+* Verbose boilerplate
+
+Spring solved this by:
+
+* POJO-based development
+* Dependency Injection
+* Declarative transaction management
+* Modular architecture
+
+💡 Spring made enterprise Java feel like normal Java again.
+
+---
+
+# 3. Spring Architecture
+
+Refere figure: 01_spring-overview.png
+
+Spring is layered:
+
+### Core Container
+
+* Core
+* Beans
+* Context
+* Expression Language (SpEL)
+
+### Data Access Layer
+
+* JDBC
+* ORM
+* Transactions
+
+### Web Layer
+
+* Web
+* Web MVC
+* WebFlux
+
+### AOP & Instrumentation
+
+Everything revolves around **IoC Container**.
+
+---
+
+# 4. The Spring Framework
+
+The Spring Framework is a **collection of modules** built around the Core Container.
+
+It supports:
+
+* Dependency Injection
+* Aspect Oriented Programming
+* Data access abstraction
+* Transaction management
+* Web MVC
+* Integration with other technologies
+
+Spring Boot is built on top of Spring Framework.
+
+---
+
+# 5. Spring Modules (1 Line Each)
+
+| Module  | What it does                        |
+| ------- | ----------------------------------- |
+| Core    | Basic IoC and DI features           |
+| Beans   | Bean lifecycle and configuration    |
+| Context | ApplicationContext implementation   |
+| SpEL    | Spring Expression Language          |
+| AOP     | Aspect-oriented programming support |
+| JDBC    | Simplifies JDBC operations          |
+| ORM     | Integration with Hibernate, JPA etc |
+| TX      | Transaction management              |
+| Web     | Web integration features            |
+| Web MVC | MVC architecture for web apps       |
+| WebFlux | Reactive web framework              |
+| Test    | Testing support for Spring apps     |
+
+---
+
+# 6. Dependencies and Dependency Injection (DI)
+
+### Dependency
+
+When one object needs another object to function.
+
+Example:
+
+```java
+class Car {
+    Engine engine = new Engine(); // tight coupling
+}
+```
+
+### Dependency Injection
+
+Instead of creating the object, we inject it.
+
+```java
+class Car {
+    Engine engine;
+    Car(Engine engine) {
+        this.engine = engine;
+    }
+}
+```
+
+👉 Spring injects dependencies automatically.
+
+---
+
+# 7. Inversion of Control (IoC) Pattern
+
+Normally:
+
+* We create objects.
+* We manage lifecycle.
+
+In IoC:
+
+* Container creates objects.
+* Container manages lifecycle.
+* Container injects dependencies.
+
+So control is inverted — from developer → to container.
+
+IoC is a concept.
+DI is the implementation of IoC.
+
+---
+
+# 8. Declaring and Managing Beans
+
+A **Bean** is simply an object managed by Spring container.
+
+Ways to declare beans:
+
+* XML
+* Java Config
+* Annotation-based (@Component, @Service, etc.)
+
+Bean lifecycle:
+
+1. Instantiate
+2. Populate properties
+3. Initialize
+4. Ready for use
+5. Destroy
+
+---
+
+# 9. BeanFactory vs ApplicationContext
+
+| BeanFactory     | ApplicationContext      |
+| --------------- | ----------------------- |
+| Basic container | Advanced container      |
+| Lazy loading    | Eager loading (default) |
+| No AOP support  | Supports AOP            |
+| No event system | Event system support    |
+| Rarely used     | Most commonly used      |
+
+👉 In real enterprise apps, we use **ApplicationContext**.
+
+---
+
+# 🔟 XML Configuration of DI
+
+```xml
+<bean id="engine" class="com.demo.Engine"/>
+
+<bean id="car" class="com.demo.Car">
+    <property name="engine" ref="engine"/>
+</bean>
+```
+
+* `<bean>` defines object
+* `<property>` injects dependency
+* `ref` connects beans
+
+Constructor injection:
+
+```xml
+<constructor-arg ref="engine"/>
+```
+
+---
+
+# 1️1. Java-Based Configuration (@Configuration + @Bean)
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public Engine engine() {
+        return new Engine();
+    }
+
+    @Bean
+    public Car car() {
+        return new Car(engine());
+    }
+}
+```
+
+* `@Configuration` → Marks config class
+* `@Bean` → Defines Spring bean
+
+This is cleaner than XML.
+
+---
+
+# 1️2. Spring Bean Autowiring
+
+Autowiring means Spring automatically resolves dependency.
+
+Instead of:
+
+```xml
+<property name="engine" ref="engine"/>
+```
+
+We let Spring decide automatically.
+
+---
+
+# 1️3. Injection with @Autowired
+
+```java
+@Component
+class Car {
+
+    @Autowired
+    private Engine engine;
+}
+```
+
+Spring:
+
+* Finds matching bean
+* Injects automatically
+
+Can be used on:
+
+* Fields
+* Constructor (recommended)
+* Setter methods
+
+Best Practice:
+
+```java
+@Autowired
+public Car(Engine engine) {
+    this.engine = engine;
+}
+```
+
+---
+
+# 1️4. Autowiring byType and byName (XML Style)
+
+## byType
+
+```xml
+<bean id="car" class="Car" autowire="byType"/>
+```
+
+Spring:
+
+* Searches bean by type
+* Injects if only one match exists
+
+⚠ If multiple beans of same type → Exception
+
+---
+
+## byName
+
+```xml
+<bean id="car" class="Car" autowire="byName"/>
+```
+
+Spring:
+
+* Matches property name with bean id
+
+Example:
+
+```java
+private Engine engine;
+```
+
+Spring looks for bean with id = "engine"
+
+---
+
+# 🎯 Important Conceptual Differences (Classroom Emphasis)
+
+| Concept    | Meaning                         |
+| ---------- | ------------------------------- |
+| IoC        | Control moved to container      |
+| DI         | Mechanism to implement IoC      |
+| Bean       | Object managed by Spring        |
+| Autowiring | Automatic dependency resolution |
+
+---

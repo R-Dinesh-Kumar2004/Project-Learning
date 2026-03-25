@@ -1,0 +1,67 @@
+
+# 🎯 Assignment 1: Hibernate Inheritance Mapping
+
+## 🧩 Problem Statement
+
+Design a system for an **Online Training Institute**.
+
+We have different types of users:
+
+* Trainer
+* Student
+* Admin
+
+All of them share some common properties.
+
+---
+
+# 🟢 Step 1: Target Schema (Expected Output)
+
+You must implement **JOINED_TABLE strategy**.
+
+### user
+| id | name | email |
+| -- | ---- | ----- |
+
+
+### trainer
+
+| id | expertise | salary | user_id |
+| -- | --------- | ------ | ------- |    
+
+### student
+
+| id | course | fees_paid | user_id |
+| -- | ------ | --------- | ------- |
+
+### admin
+
+| id | department | access_level | user_id |
+| -- | ---------- | ------------ | ------- |
+
+---
+
+# 🟢 Step 2: CRUD Requirements
+
+Students must write:
+
+### 1. Save two objects of each type
+
+```java
+Trainer
+Student
+Admin
+```
+
+---
+
+### 2. Fetch the 2 Admins
+
+---
+
+### 3.1. Update  Trainer no. 1, change expertise 
+### 3.2. Update  Trainer no. 2, change expertise and salary
+
+### 4. Delete one Student
+
+---

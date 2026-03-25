@@ -1,0 +1,365 @@
+
+# 📄 Software Requirements Specifications
+
+# 🛒 SbEcomApp – Spring Boot E-Commerce Backend
+
+---
+
+# 1. Project Overview
+
+SbEcomApp is a backend RESTful e-commerce application built using Spring Boot.
+
+The system allows:
+
+* User registration and login
+* Category and product management
+* Product browsing and filtering
+* Order placement
+* Stock management
+* Centralized error handling
+* Logging using AOP
+* API documentation using Swagger
+* Monitoring using Actuator
+
+The application follows a layered architecture:
+
+Controller → Service → Repository → Database
+
+---
+
+# 2. System Architecture
+
+The system uses:
+
+* Spring Boot
+* Spring Data JPA
+* MySQL
+* REST APIs
+* AOP for logging
+* Centralized Exception Handling
+* Swagger/OpenAPI
+* Actuator
+
+---
+
+# 3. Actors
+
+## 👤 Customer
+
+* Registers
+* Logs in
+* Browses products
+* Places order
+
+## 👨‍💼 Admin (basic role)
+
+* Creates categories
+* Creates products
+* Manages users
+
+---
+
+# 4. Functional Requirements
+
+---
+
+# 4.1 User Management
+
+## 4.1.1 Register
+
+* User provides:
+
+  * name
+  * email
+  * password
+  * role
+* System:
+
+  * Validates input
+  * Checks if email already exists
+  * Encrypts password
+  * Saves user
+  * Returns success response
+
+---
+
+## 4.1.2 Login
+
+* User provides:
+
+  * email
+  * password
+* System:
+
+  * Fetches user by email
+  * Compares encrypted password
+  * Returns success if valid
+  * Returns 401 if invalid
+
+---
+
+# 4.2 Category Management
+
+Admin can:
+
+* Create category
+* Update category
+* Delete category
+* View all categories
+
+Each category has:
+
+* id
+* name
+* description
+
+A category can have multiple products.
+
+---
+
+# 4.3 Product Management
+
+Admin can:
+
+* Create product
+* Update product
+* Delete product
+* Upload product image
+
+Users can:
+
+* View all products
+* Filter by:
+
+  * category
+  * price range
+  * name
+
+Each product contains:
+
+* id
+* name
+* price
+* stock
+* imagePath
+* category (ManyToOne)
+
+---
+
+# 4.4 Order Management
+
+Customers can place orders.
+
+## Order Placement Workflow
+
+1. User sends request with:
+
+   * userId
+   * list of items (productId + quantity)
+
+2. System performs:
+
+   * Validate user exists
+   * Validate each product exists
+   * Check stock availability
+   * Reduce stock
+   * Create Order
+   * Create OrderItems
+   * Calculate totalAmount
+   * Save everything inside one transaction
+
+3. System returns:
+
+   * Order ID
+   * Order summary
+   * Total amount
+
+---
+
+# 4.5 OrderItem Handling
+
+OrderItem is not independently managed.
+
+It:
+
+* Belongs to an Order
+* Is created during order placement
+* Cannot exist without an order
+
+OrderItem contains:
+
+* id
+* quantity
+* price
+* product
+* order
+
+---
+
+# 5. Non-Functional Requirements
+
+---
+
+# 5.1 Exception Handling
+
+The system must:
+
+* Use centralized exception handling
+* Return standardized error responses
+* Avoid exposing stack traces
+* Handle:
+
+  * Resource not found
+  * Invalid credentials
+  * Business errors (stock)
+  * Validation errors
+  * Generic errors
+
+---
+
+# 5.2 Logging
+
+The system must:
+
+* Log service layer method execution
+* Log execution time
+* Log exceptions
+* Use AOP for cross-cutting logging
+
+---
+
+# 5.3 API Standardization
+
+All API responses must:
+
+* Follow uniform success structure
+* Follow uniform error structure
+* Use proper HTTP status codes
+* Follow REST naming conventions
+
+---
+
+# 5.4 Documentation
+
+The system must:
+
+* Expose Swagger UI
+* Provide OpenAPI specification
+* Allow API testing through Swagger
+
+---
+
+# 5.5 Monitoring
+
+The system must:
+
+* Expose Actuator endpoints
+* Provide health checks
+* Provide metrics
+* Allow custom health indicator
+
+---
+
+# 6. Data Initialization
+
+The system supports two ways of sample data insertion:
+
+1. Using data.sql (SQL-based insertion)
+2. Using CommandLineRunner (Java-based insertion)
+
+Purpose:
+
+* Demonstrate application startup lifecycle
+* Compare SQL vs programmatic insertion
+
+---
+
+# 7. Database Relationships
+
+## User → Order
+
+One user can have many orders.
+
+## Category → Product
+
+One category can have many products.
+
+## Order → OrderItem
+
+One order can have many order items.
+
+## Product → OrderItem
+
+One product can appear in many order items.
+
+---
+
+# 8. Transaction Management
+
+Order placement must be transactional.
+
+If:
+
+* Stock is insufficient
+* Any product not found
+* Any runtime error occurs
+
+Then:
+
+* Entire order must roll back.
+
+---
+
+# 9. API Workflow Summary
+
+User Flow:
+
+Register → Login → View Products → Place Order → View Orders
+
+Admin Flow:
+
+Create Category → Create Product → Upload Image → View Orders
+
+---
+
+# 10. Application Lifecycle
+
+1. Application starts
+2. Auto-configuration initializes database
+3. data.sql executes
+4. CommandLineRunner executes
+5. APIs become available
+6. AOP starts intercepting service calls
+7. Actuator endpoints become accessible
+
+---
+
+# 🎯 Overall Workflow Summary
+
+1. System initializes.
+2. Sample data is inserted.
+3. User registers and logs in.
+4. Admin manages categories and products.
+5. User browses products.
+6. User places order.
+7. Transaction processes order.
+8. Stock updates.
+9. Logging captures execution.
+10. Exceptions handled centrally.
+11. Swagger documents APIs.
+12. Actuator monitors application health.
+
+---
+
+This document gives:
+
+✔ Clear business flow
+✔ Technical mapping
+✔ Architectural clarity
+✔ Classroom roadmap
+
+---
+
+This project now feels complete. 🔥
+
+---

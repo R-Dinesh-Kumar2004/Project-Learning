@@ -1,0 +1,251 @@
+
+# HTTP – Stateless Protocol & HTTP Methods
+
+---
+
+## 1. What is HTTP?
+
+### Definition
+
+> **HTTP (HyperText Transfer Protocol)** is a communication protocol used between **client and server**.
+
+* Client sends **HTTP request**
+* Server sends **HTTP response**
+* Servlets work **on top of HTTP**
+
+---
+
+## 2. Why HTTP is Called a Stateless Protocol
+
+### Meaning of Stateless
+
+> **Stateless means the server does not remember previous requests from the client.**
+
+Each request is:
+
+* independent
+* unrelated to previous requests
+* treated as a **new request**
+
+---
+
+### Example
+
+1. Client sends login request
+2. Server validates and responds
+3. **Server forgets everything**
+
+If client sends another request:
+
+* server does **not** remember login automatically
+
+👉 This is why:
+
+* sessions exist
+* cookies exist
+* tokens exist (later topics)
+
+---
+
+## 3. Why HTTP Was Designed Stateless
+
+### Advantages
+
+* Simple
+* Fast
+* Scalable
+* Server does not maintain heavy memory
+
+### Disadvantage
+
+* No automatic user tracking
+* No memory of client state
+
+👉 Java EE and Spring provide solutions for this later.
+
+---
+
+## 4. HTTP Request–Response Cycle (Quick Recap)
+
+1. Client sends HTTP request
+2. Server processes request
+3. Server sends HTTP response
+4. Connection ends
+
+👉 State is **not stored** automatically.
+
+---
+
+## 5. HTTP Methods (Request Types)
+
+### What is an HTTP Method?
+
+> **HTTP method defines the purpose of the request.**
+
+It tells the server:
+
+* what action client wants
+* how to handle the request
+
+---
+
+## 6. Common HTTP Methods (Important)
+
+### 6.1 GET
+
+### Purpose
+
+> Used to **request data** from the server.
+
+### Characteristics
+
+* Data is sent via URL
+* Data is visible in browser
+* Can be bookmarked
+* Should not change server data
+
+### Example
+
+```
+/greet?name=Amit
+```
+
+### Servlet Mapping
+
+```java
+doGet()
+```
+
+---
+
+## 6.2 POST
+
+### Purpose
+
+> Used to **send data** to the server.
+
+### Characteristics
+
+* Data is sent in request body
+* Data is not visible in URL
+* Used for forms
+* Can change server data
+
+### Example
+
+* Login form
+* Registration form
+
+### Servlet Mapping
+
+```java
+doPost()
+```
+
+---
+
+## 6.3 PUT
+
+### Purpose
+
+> Used to **update existing data** on the server.
+
+### Characteristics
+
+* Common in REST APIs
+* Replaces existing resource
+
+👉 Rare in plain servlets, common in Spring REST.
+
+---
+
+## 6.4 DELETE
+
+### Purpose
+
+> Used to **delete data** on the server.
+
+### Characteristics
+
+* Deletes a resource
+* Used mainly in APIs
+
+---
+
+## 6.5 PATCH
+
+### Purpose
+
+> Used to **partially update data**.
+
+### Example
+
+* Update only email of user
+* Update only status field
+
+---
+
+## 7. HTTP Methods – Summary Table
+
+| Method | Purpose        | Data Visible | Servlet Method |
+| ------ | -------------- | ------------ | -------------- |
+| GET    | Fetch data     | Yes (URL)    | doGet()        |
+| POST   | Send data      | No           | doPost()       |
+| PUT    | Update data    | No           | doPut()        |
+| DELETE | Delete data    | No           | doDelete()     |
+| PATCH  | Partial update | No           | —              |
+
+---
+
+## 8. Idempotent vs Non-Idempotent (Interview Friendly)
+
+### Idempotent Methods
+
+> Multiple requests give **same result**.
+
+Examples:
+
+* GET
+* PUT
+* DELETE
+
+---
+
+### Non-Idempotent Methods
+
+> Multiple requests may give **different results**.
+
+Example:
+
+* POST (creates new data each time)
+
+---
+
+## 9. Why This Matters for Servlets
+
+* Browser decides HTTP method
+* Form method decides servlet method
+* Container routes request based on method
+
+👉 **Rule to remember**:
+
+> GET → doGet()
+> POST → doPost()
+
+---
+
+## 10. One-Line Memory Rule (Very Important)
+
+> **HTTP is stateless, request-based, and method-driven.**
+
+---
+
+## Key Takeaways
+
+* HTTP does not remember client
+* Every request is independent
+* Method defines intention
+* Servlets map methods to doXXX()
+* State handling is extra logic
+
+---

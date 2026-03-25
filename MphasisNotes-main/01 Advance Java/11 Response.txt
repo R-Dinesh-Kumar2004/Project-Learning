@@ -1,0 +1,253 @@
+
+# Response (Server → Browser)
+
+---
+
+## 1. What is an HTTP Response?
+
+### Simple Definition
+
+> An **HTTP Response** is a message sent by the server to the browser after processing a request.
+
+👉 Every servlet:
+
+* reads **Request**
+* produces **Response**
+
+---
+
+## 2. Components of an HTTP Response
+
+An HTTP response mainly contains **three parts**:
+
+---
+
+### 2.1 Status Line
+
+Contains:
+
+* HTTP version
+* Status code
+* Status message
+
+Example:
+
+```text
+HTTP/1.1 200 OK
+```
+
+👉 Tells browser whether request was successful or not.
+
+---
+
+### 2.2 Response Headers
+
+> Headers provide **additional information** about the response.
+
+Examples:
+
+* content type
+* content length
+* cache control
+* cookies
+
+Example:
+
+```java
+response.setContentType("text/html");
+```
+
+👉 Browser decides **how to handle response** based on headers.
+
+---
+
+### 2.3 Response Body
+
+> Response body contains **actual data sent to the browser**.
+
+Examples:
+
+* HTML content
+* plain text
+* JSON
+* XML
+
+👉 This is what the **user finally sees**.
+
+---
+
+## 3. How a Servlet Sends Response
+
+Servlet sends response using:
+
+* `HttpServletResponse`
+
+Main tools:
+
+* `PrintWriter`
+* `sendRedirect()`
+* `RequestDispatcher` (forward – next topic)
+
+---
+
+## 4. Sending Response Using PrintWriter
+
+### Rule
+
+> Use **PrintWriter** to send output directly to the browser.
+
+---
+
+### Example
+
+```java
+PrintWriter out = response.getWriter();
+out.println("Hello from Servlet");
+```
+
+---
+
+### Sending HTML Content
+
+```java
+response.setContentType("text/html");
+
+PrintWriter out = response.getWriter();
+out.println("<h2>Welcome</h2>");
+out.println("<p>Login Successful</p>");
+```
+
+👉 Browser renders HTML properly.
+
+---
+
+### Key Points
+
+* Response is sent **immediately**
+* No new request is created
+* Same request–response cycle
+
+---
+
+## 5. HTTP Status Codes (Very Important)
+
+### What is a Status Code?
+
+> Status code tells browser the **result of request processing**.
+
+---
+
+### Common Status Codes
+
+| Code      | Meaning               | When Used          |
+| --------- | --------------------- | ------------------ |
+| 200       | OK                    | Successful request |
+| 301 / 302 | Redirect              | Resource moved     |
+| 400       | Bad Request           | Invalid input      |
+| 401       | Unauthorized          | Login required     |
+| 403       | Forbidden             | Access denied      |
+| 404       | Not Found             | Resource missing   |
+| 500       | Internal Server Error | Server failure     |
+
+---
+
+### Setting Status Code Manually
+
+```java
+response.setStatus(404);
+```
+
+👉 Browser behavior depends on status code.
+
+---
+
+## 6. Redirection (Response-Based Navigation)
+
+### Meaning
+
+> Server instructs browser to go to another URL.
+
+---
+
+### Example
+
+```java
+response.sendRedirect("home.html");
+```
+
+---
+
+### What Happens Internally
+
+1. Server sends **redirect response**
+2. Browser receives redirect instruction
+3. Browser sends **new GET request**
+4. New response is received
+
+---
+
+### Important Rules
+
+* Old request data is lost
+* Always creates a **new request**
+* URL changes in browser
+
+---
+
+## 7. Response Content Types
+
+### Why Content Type Matters
+
+> Content type tells browser **how to interpret response data**.
+
+---
+
+### Common Content Types
+
+| Content Type     | Usage      |
+| ---------------- | ---------- |
+| text/html        | Web pages  |
+| text/plain       | Plain text |
+| application/json | REST APIs  |
+| application/xml  | XML data   |
+
+---
+
+### Example
+
+```java
+response.setContentType("application/json");
+```
+
+---
+
+## 8. Response vs Request (Quick Comparison)
+
+| Feature     | Request            | Response              |
+| ----------- | ------------------ | --------------------- |
+| Direction   | Browser → Server   | Server → Browser      |
+| Purpose     | Send data          | Send result           |
+| Contains    | method, parameters | status, headers, body |
+| Object Used | HttpServletRequest | HttpServletResponse   |
+
+---
+
+## 9. One-Line Memory Rules (Tell Them to Remember)
+
+* Request comes **from browser**
+* Response goes **to browser**
+* PrintWriter sends output
+* Redirect creates **new request**
+* Status code defines result
+
+---
+
+## Key Takeaways
+
+* Servlet always ends with response
+* Response contains status, headers, body
+* PrintWriter sends direct output
+* Redirect changes request flow
+* Browser behavior depends on response
+
+---

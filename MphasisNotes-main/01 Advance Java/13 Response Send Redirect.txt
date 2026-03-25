@@ -1,0 +1,133 @@
+
+# Response.sendRedirect()
+
+---
+
+## 1. What is `sendRedirect()`?
+
+### Simple Definition
+
+> `sendRedirect()` is a method used by the server to tell the browser to **go to another URL**.
+
+* It is part of **HttpServletResponse**
+* It is used for **navigation**
+
+---
+
+## 2. Syntax
+
+```java
+response.sendRedirect("home.html");
+```
+
+---
+
+## 3. What Actually Happens Internally
+
+When `sendRedirect()` is executed:
+
+1. Servlet sends a **redirect response** to the browser
+2. Browser receives the response
+3. Browser creates a **new HTTP request**
+4. Browser sends request to the new URL
+5. Server processes the new request
+
+👉 **Two requests are involved**
+
+---
+
+## 4. HTTP Method Used in Redirect
+
+### Rule
+
+> `sendRedirect()` **always results in a GET request**.
+
+Even if:
+
+* original request was POST
+* form was submitted
+
+---
+
+## 5. URL Behavior
+
+* Browser URL **changes**
+* User can:
+
+  * bookmark the new URL
+  * refresh the page
+
+---
+
+## 6. Data Handling in Redirect
+
+### Important Rule
+
+> Data from the old request is **lost**.
+
+Because:
+
+* a new request object is created
+* request parameters are not carried forward automatically
+
+---
+
+### How to Pass Data (Basic Idea)
+
+* Using URL rewriting:
+
+```java
+response.sendRedirect("result?status=success");
+```
+
+👉 Advanced techniques come later.
+
+---
+
+## 7. Typical Use Cases of `sendRedirect()`
+
+* After login success → go to dashboard
+* After logout → go to login page
+* After form submission → go to success page
+* Prevent form re-submission on refresh
+
+---
+
+## 8. `sendRedirect()` vs Normal Response
+
+| Feature             | Normal Response | sendRedirect |
+| ------------------- | --------------- | ------------ |
+| Number of requests  | One             | Two          |
+| URL changes         | No              | Yes          |
+| Request data        | Available       | Lost         |
+| Browser involvement | No              | Yes          |
+| HTTP method         | Same            | GET          |
+
+---
+
+## 9. Common Mistakes Students Make
+
+❌ Expecting request data after redirect
+❌ Assuming POST will remain POST
+❌ Thinking redirect is server-side
+❌ Writing output before redirect
+
+---
+
+## 🔟 One-Line Memory Rules (Tell Them to Remember)
+
+* `sendRedirect()` → **new request**
+* `sendRedirect()` → **GET**
+* `sendRedirect()` → **URL changes**
+* Old request data → **lost**
+
+---
+
+## Key Takeaways
+
+* Redirect is client-side navigation
+* Browser decides next request
+* Used for clean navigation flow
+* Very common in real applications
+
+---

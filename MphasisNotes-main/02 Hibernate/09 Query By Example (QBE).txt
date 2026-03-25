@@ -1,0 +1,178 @@
+
+# 🟢 Query By Example (QBE)
+
+---
+
+# 1. What is Query By Example?
+
+Query By Example is:
+
+* A way to create query **without writing HQL**
+* We create an object
+* Set some properties
+* Hibernate builds the query automatically
+* It matches based on **non-null fields**
+
+Instead of writing:
+
+```java
+from Employee e where e.name = :n and e.grade = :g
+```
+
+We create an object and set values.
+
+---
+
+# 2. Basic Idea
+
+👉 Non-null properties are used as conditions.
+👉 Null properties are ignored.
+
+---
+
+# 3. Simple Example
+
+Find employee by name.
+
+```java
+Employee exampleEmployee = new Employee();
+exampleEmployee.setName("Amit");
+
+Example example = Example.create(exampleEmployee);
+
+Criteria criteria = session.createCriteria(Employee.class);
+criteria.add(example);
+
+List<Employee> list = criteria.list();
+```
+
+This internally works like:
+
+```sql
+where name = 'Amit'
+```
+
+---
+
+# 4. Multiple Conditions
+
+```java
+Employee exampleEmployee = new Employee();
+exampleEmployee.setName("Amit");
+exampleEmployee.setGrade('A');
+
+Example example = Example.create(exampleEmployee);
+
+Criteria criteria = session.createCriteria(Employee.class);
+criteria.add(example);
+
+List<Employee> list = criteria.list();
+```
+
+Equivalent to:
+
+```sql
+where name = 'Amit' and grade = 'A'
+```
+
+---
+
+# 5. Ignoring Some Fields
+
+If a field is null:
+
+```java
+exampleEmployee.setSalary(null);
+```
+
+It is ignored automatically.
+
+---
+
+# 6. LIKE Matching
+
+By default, QBE does exact match.
+
+For LIKE behavior:
+
+```java
+Example example = Example.create(exampleEmployee)
+                         .enableLike()
+                         .ignoreCase();
+```
+
+Now it behaves like:
+
+```sql
+where name like 'amit'
+```
+
+---
+
+# 7. Ignoring Specific Fields
+
+If you want to ignore a field explicitly:
+
+```java
+Example example = Example.create(exampleEmployee)
+                         .excludeProperty("salary");
+```
+
+---
+
+# 8. QBE vs HQL vs Criteria
+
+| HQL          | Criteria     | QBE             |
+| ------------ | ------------ | --------------- |
+| String based | Programmatic | Object based    |
+| Flexible     | Dynamic      | Very simple     |
+| More control | More control | Limited control |
+
+---
+
+# 9. When Should We Use QBE?
+
+Good for:
+
+* Simple search forms
+* Optional filters
+* Matching based on filled fields
+* Small applications
+
+---
+
+# 10. Limitations
+
+❌ Cannot perform joins
+❌ Cannot perform aggregation
+❌ Limited comparison operators
+❌ Not suitable for complex conditions
+❌ Older API (not commonly used in modern Hibernate)
+
+---
+
+# 1️1. Advantages
+
+✅ Very simple
+✅ No query writing
+✅ Auto builds condition
+✅ Good for basic filtering
+
+---
+
+# 🎯 Teaching Summary Line
+
+You can conclude like this:
+
+> HQL gives full control.
+> Criteria gives dynamic control.
+> Query By Example gives simplicity with limited control.
+
+---
+
+One small practical note:
+
+Modern Hibernate prefers Criteria API.
+QBE is older and less commonly used now — but conceptually useful to understand object-based querying.
+
+---

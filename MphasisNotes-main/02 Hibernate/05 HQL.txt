@@ -1,0 +1,335 @@
+
+# 🟢 HQL (Hibernate Query Language)
+
+---
+
+# 1. What is HQL?
+
+HQL is:
+
+* An object-oriented query language
+* Used to query entities
+* Similar to SQL syntax
+* Database independent
+
+Example:
+
+```java
+String hql = "from Employee";
+Query<Employee> query = session.createQuery(hql, Employee.class);
+List<Employee> employees = query.getResultList();
+```
+
+---
+
+# 2. SQL vs HQL
+
+SQL:
+
+```sql
+select name from employee
+```
+
+HQL:
+
+```java
+String hql = "select e.name from Employee e";
+Query<String> query = session.createQuery(hql, String.class);
+List<String> names = query.getResultList();
+```
+
+👉 Using:
+
+* `Employee` (class name)
+* `name` (field name)
+
+---
+
+# 3. Why No `INSERT INTO` in HQL?
+
+Hibernate inserts using `session.save()` or `persist()`:
+
+```java
+Employee emp = new Employee();
+emp.setName("Amit");
+emp.setSalary(new BigDecimal("50000"));
+emp.setBonus(5000);
+emp.setJoiningDate(new Date());
+emp.setActive(true);
+emp.setExperience(3);
+emp.setGrade('A');
+
+session.save(emp);
+```
+
+HQL mainly supports:
+
+* SELECT
+* UPDATE
+* DELETE
+
+---
+
+# 4. Basic CRUD using HQL
+
+---
+
+## 🔹 SELECT (Read)
+
+### Get all employees
+
+** Practice Query 1
+
+```java
+String hql = "from Employee";
+Query<Employee> query = session.createQuery(hql, Employee.class);
+List<Employee> list = query.getResultList();
+```
+
+---
+
+### With condition
+
+** Practice Query 2
+
+```java
+String hql = "from Employee e where e.salary > 50000";
+Query<Employee> query = session.createQuery(hql, Employee.class);
+
+List<Employee> list = query.getResultList();
+```
+
+---
+
+## 🔹 UPDATE
+
+** Practice Query 8
+
+```java
+String hql = "update Employee e set e.bonus = :b where e.id = :id";
+
+MutationQuery query = session.createMutationQuery(hql);
+
+query.setParameter("b", 5000.0);
+query.setParameter("id", 1);
+
+int rows = query.executeUpdate();
+```
+
+Returns number of rows affected.
+
+---
+
+## 🔹 DELETE
+
+** Practice Query 9
+
+```java
+String hql = "delete from Employee e where e.salary < :sal";
+MutationQuery query = session.createMutationQuery(hql);
+
+query.setParameter("sal", new BigDecimal("31000"));
+
+int rows = query.executeUpdate();
+```
+
+---
+
+# 5. Parameter Binding
+
+Example:
+
+```java
+String hql = "from Employee e where e.joiningDate = :f";
+
+Query<Employee> query = session.createQuery(hql, Employee.class);
+query.setParameter("f", new Date());
+
+List<Employee> list = query.getResultList();
+```
+
+Another example:
+
+** Practice Query 3
+
+```java
+String hql = "from Employee e where e.salary > :sal and e.grade = :g";
+
+Query<Employee> query = session.createQuery(hql, Employee.class);
+query.setParameter("sal", new BigDecimal("31000"));
+query.setParameter("g", 'C');
+
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 6. Returning Full Object vs Specific Columns
+
+---
+
+## 🔹 Returning full entity
+
+```java
+String hql = "from Employee";
+
+Query<Employee> query = session.createQuery(hql, Employee.class);
+List<Employee> list = query.getResultList();
+```
+
+Return type:
+`List<Employee>`
+
+---
+
+## 🔹 Returning specific field
+
+** Practice Query 4
+
+```java
+String hql = "select e.name from Employee e";
+
+Query<String> query = session.createQuery(hql, String.class);
+List<String> names = query.getResultList();
+```
+
+---
+
+## 🔹 Returning multiple fields
+
+** Practice Query 5
+
+```java
+String hql = "select e.name, e.salary from Employee e";
+
+Query<Object[]> query = session.createQuery(hql, Object[].class);
+List<Object[]> rows = query.getResultList();
+
+for (Object[] row : rows) {
+    String name = (String) row[0];
+    BigDecimal salary = (BigDecimal) row[1];
+}
+```
+
+Returns:
+`List<Object[]>`
+
+---
+
+# 7. Aggregation Functions
+
+---
+
+## 🔹 COUNT
+
+```java
+String hql = "select count(e) from Employee e";
+
+Query<Long> query = session.createQuery(hql, Long.class);
+Long total = query.getSingleResult();
+```
+
+---
+
+## 🔹 AVG
+
+```java
+String hql = "select avg(e.salary) from Employee e";
+
+Query<Double> query = session.createQuery(hql, Double.class);
+Double avgSalary = query.getSingleResult();
+```
+
+---
+
+## 🔹 SUM
+
+```java
+String hql = "select sum(e.bonus) from Employee e";
+
+Query<Double> query = session.createQuery(hql, Double.class);
+Double totalBonus = query.getSingleResult();
+```
+
+Aggregation returns a **single value**, not Employee objects.
+
+---
+
+# 8. Ordering
+
+```java
+String hql = "from Employee e order by e.salary desc";
+
+Query<Employee> query = session.createQuery(hql, Employee.class);
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 9. Pagination
+
+```java
+String hql = "from Employee e order by e.id";
+
+Query<Employee> query = session.createQuery(hql, Employee.class);
+query.setFirstResult(0);   // starting index
+query.setMaxResults(5);    // limit
+
+List<Employee> page = query.getResultList();
+```
+
+Used for paging.
+
+---
+
+# 10. Operators
+
+Example:
+
+```java
+String hql = "from Employee e where e.grade = :g";
+
+Query<Employee> query = session.createQuery(hql, Employee.class);
+query.setParameter("g", 'A');
+List<Employee> list = query.getResultList();
+```
+
+LIKE example:
+
+```java
+String hql = "from Employee e where e.name like :pattern";
+
+Query<Employee> query = session.createQuery(hql, Employee.class);
+query.setParameter("pattern", "A%");
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 1️1. Significance of HQL
+
+Why we use it:
+
+* Cleaner than SQL in Hibernate
+* Works with object model
+* DB independent
+* Automatically converted into SQL internally
+
+---
+
+# 1️2. Pros & Cons
+
+### ✅ Pros
+
+* Object oriented
+* Easy to read
+* Supports parameter binding
+* DB independent
+
+### ❌ Cons
+
+* String based → runtime errors
+* Less type safety
+* Not ideal for complex queries
+
+---

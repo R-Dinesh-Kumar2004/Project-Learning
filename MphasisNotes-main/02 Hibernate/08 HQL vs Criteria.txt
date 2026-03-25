@@ -1,0 +1,195 @@
+
+# 🟢 HQL vs Criteria API
+
+---
+
+# 1. Basic Difference
+
+| HQL                           | Criteria API             |
+| ----------------------------- | ------------------------ |
+| String-based query            | Programmatic query       |
+| Similar to SQL                | Built using Java objects |
+| Compact and readable          | More verbose             |
+| Runtime error if syntax wrong | More type-safe           |
+
+---
+
+# 2. Example Comparison
+
+---
+
+## 🔹 HQL Version
+
+```java
+String hql = "from Employee e where e.salary > :sal";
+
+Query<Employee> query =
+        session.createQuery(hql, Employee.class);
+
+query.setParameter("sal", new BigDecimal("60000"));
+
+List<Employee> list = query.getResultList();
+```
+
+Short. Clean. Easy to read.
+
+---
+
+## 🔹 Criteria Version
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+
+Root<Employee> root = cq.from(Employee.class);
+
+cq.select(root)
+  .where(cb.gt(root.get("salary"), new BigDecimal("60000")));
+
+List<Employee> list =
+        session.createQuery(cq).getResultList();
+```
+
+More lines. More structured.
+
+---
+
+# 3. When Should We Use HQL?
+
+Use HQL when:
+
+* Query is simple
+* Conditions are fixed
+* Query is known in advance
+* Readability is important
+* DAO method is small
+
+Example:
+
+* Find all employees
+* Find by salary
+* Simple update or delete
+
+👉 HQL is shorter and easier.
+
+---
+
+# 4. When Should We Use Criteria?
+
+Use Criteria when:
+
+* Conditions are dynamic
+* Filters depend on user input
+* Multiple optional parameters
+* Complex query building logic
+
+Example:
+
+Search form with optional fields:
+
+* Salary (optional)
+* Grade (optional)
+* Experience (optional)
+
+---
+
+# 5. Dynamic Query Example
+
+---
+
+## 🔹 HQL Dynamic (String Building)
+
+```java
+String hql = "from Employee e where 1=1";
+
+if (salary != null) {
+    hql += " and e.salary > :sal";
+}
+
+if (grade != null) {
+    hql += " and e.grade = :g";
+}
+```
+
+Problems:
+
+* String concatenation
+* Syntax errors possible
+* Hard to maintain
+
+---
+
+## 🔹 Criteria Dynamic (Cleaner Logic)
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+Root<Employee> root = cq.from(Employee.class);
+
+List<Predicate> predicates = new ArrayList<>();
+
+if (salary != null) {
+    predicates.add(cb.gt(root.get("salary"), salary));
+}
+
+if (grade != null) {
+    predicates.add(cb.equal(root.get("grade"), grade));
+}
+
+cq.select(root)
+  .where(predicates.toArray(new Predicate[0]));
+
+List<Employee> list =
+        session.createQuery(cq).getResultList();
+```
+
+Cleaner for dynamic conditions.
+
+---
+
+# 6. Readability Comparison
+
+| HQL            | Criteria                     |
+| -------------- | ---------------------------- |
+| Easy to read   | Harder to read               |
+| Looks like SQL | Looks like Java builder code |
+| Compact        | Verbose                      |
+
+---
+
+# 7. Error Handling Difference
+
+HQL:
+
+* Errors detected at runtime
+* Typos in query string not caught early
+
+Criteria:
+
+* More structured
+* Better IDE support
+* Slightly safer
+
+---
+
+# 8. Final Conceptual Difference
+
+HQL:
+
+> Writing the query as a string.
+
+Criteria:
+
+> Building the query using Java logic.
+
+---
+
+# 🎯 Summary
+
+> HQL is best for simple and fixed queries.
+> Criteria API is best for dynamic and condition-based queries.
+
+Both are correct.
+Choice depends on situation.
+
+---

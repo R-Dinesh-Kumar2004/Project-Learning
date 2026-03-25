@@ -1,0 +1,178 @@
+
+# Swagger UI in Spring Boot
+
+---
+
+## 1. **What is Swagger UI?**
+
+* A web-based interface to **visualize and test REST APIs**.
+* Part of **OpenAPI Specification (OAS)** ecosystem.
+* Provides **interactive documentation** → Developers, testers, and clients can try APIs directly in browser.
+
+---
+
+## 2. **Key Benefits**
+
+* ✅ Auto-generates API documentation.
+* ✅ Helps in API testing without external tools (like Postman).
+* ✅ Improves collaboration between backend, frontend, QA.
+* ✅ Supports authentication (JWT, OAuth2, Basic).
+* ✅ Versioning & contract-first API design support.
+
+---
+
+## 3. **Set Up**
+
+1. Check version of Spring Boot (here 3.5.4) and Java (here 21)
+
+<parent>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-parent</artifactId>
+	<version>3.5.4</version>
+	<relativePath/> <!-- lookup parent from repository -->
+</parent>
+
+<properties>
+	<java.version>21</java.version>
+</properties>
+
+2. Add Swagger dependency (here 2.7.0) based on SB and Java versions
+
+<dependency>
+	<groupId>org.springdoc</groupId>
+	<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+	<version>2.7.0</version>
+</dependency>
+
+3. Update Maven
+
+4. Configure Swagger in application.properties
+
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+
+---
+
+## 4. Default Swagger Endpoints
+
+Once dependency is added, start the app and open in browser:
+
+OpenAPI JSON: http://localhost:8080/api-docs
+
+Swagger UI: http://localhost:8080/swagger-ui/index.html
+
+---
+
+## 5. **Customization for Appliation**
+(Optional)
+
+In application.properties:
+
+app.name=Sb Practice
+app.version=1.0.0
+app.author=Kaustubh Choudhary
+app.email=kaustubhchouhdhary@yahoo.com
+
+```java
+import org.springframework.beans.factory.annotation.Value;
+
+@Configuration
+public class SwaggerConfig {
+
+    @Value("${app.name}")
+    private String appName;
+
+    @Value("${app.version}")
+    private String appVersion;
+
+    @Value("${app.author}")
+    private String appAuthor;
+
+    @Value("${app.email}")
+    private String appEmail;
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title(appName)
+                .version(appVersion)
+                .description("API documentation for " + appName)
+                .contact(new Contact().name(appAuthor).email(appEmail)));
+    }
+}
+
+```
+
+---
+
+## 6. **Swagger Annotations**
+
+* `@Tag` → Groups endpoints.
+* `@Operation` → Describes a REST endpoint.
+* `@ApiResponse` → Documents responses.
+* `@Parameter` → Documents method parameters.
+* `@Schema` → Describes model attributes.
+
+Example:
+
+```java
+@Tag(name = "Users", description = "User management APIs")
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @Operation(summary = "Get user by ID", description = "Fetch a user by their unique ID")
+    @ApiResponse(responseCode = "200", description = "User found")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(new User(id, "John Doe"));
+    }
+}
+```
+
+---
+
+## 9. **Best Practices**
+
+* ✅ Use meaningful summaries/descriptions.
+* ✅ Group APIs with `@Tag`.
+* ✅ Add response codes (`@ApiResponse`) for clarity.
+* ✅ Secure Swagger in production (disable or restrict access).
+* ✅ Keep versioning info updated.
+
+---
+## 10. **Genarate Documents**
+
+HTML Doc
+--------
+Step 1: Install Swagger Codegen CLI:
+npm install -g @openapitools/openapi-generator-cli
+
+Step 2: Generate documentation
+
+openapi-generator-cli generate -i http://localhost:9192/api-docs -g html -o api-docs-html
+
+PDF Doc
+-------
+Step 1: Install Redoc CLI
+
+npm install -g redoc-cli
+
+Step 2: Generate HTML
+redoc-cli build http://localhost:9192/api-docs -o api-doc.html
+
+Step 3: Get PDF from HTML 
+Open the file in Chrome → Print → Save as PDF.
+
+---
+
+## 11. **Interview Pointers**
+
+* **Swagger vs OpenAPI** → OpenAPI is the spec, Swagger is the tooling.
+* **Swagger UI purpose** → Interactive API documentation.
+* **Why springdoc over springfox?** → Springfox not compatible with Spring Boot 3.
+* **Security handling?** → Supports Basic, JWT, OAuth2.
+
+---

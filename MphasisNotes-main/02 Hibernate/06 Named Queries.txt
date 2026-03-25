@@ -1,0 +1,262 @@
+
+# 🟢 Named Queries in Hibernate
+
+---
+
+# 1. What is a Named Query?
+
+A Named Query is:
+
+* A **predefined HQL query**
+* Defined once
+* Reused multiple times
+* Given a unique name
+
+Instead of writing HQL string everywhere:
+
+```java
+"from Employee where salary > :sal"
+```
+
+We define it once inside the entity.
+
+---
+
+# 2. Why Do We Need Named Queries?
+
+Problems with normal HQL:
+
+* Query strings scattered in multiple classes
+* Hard to maintain
+* Hard to modify
+* String duplication
+
+Named Query solves:
+
+* Centralized query definition
+* Reusability
+* Better readability
+* Slight performance benefit (parsed once)
+
+---
+
+# 3. Defining Named Query
+
+Defined using annotations in entity class.
+
+Example:
+
+```java
+@Entity
+@NamedQuery(
+    name = "Employee.findAll",
+    query = "from Employee"
+)
+@NamedQuery(
+    name = "Employee.findBySalary",
+    query = "from Employee e where e.salary > :sal"
+)
+public class Employee {
+    ...
+}
+```
+
+Important:
+
+* `name` → unique identifier
+* `query` → HQL statement
+* Uses entity name and field names
+
+---
+
+# 4. Executing Named Query
+
+---
+
+## 🔹 Example 1: Find All Employees
+
+
+```
+@NamedQuery(
+    name = "Employee.findAll",
+    query = "from Employee"
+)
+```
+
+```java
+Query<Employee> query =
+        session.createNamedQuery("Employee.findAll", Employee.class);
+
+List<Employee> list = query.getResultList();
+```
+
+---
+
+## 🔹 Example 2: With Parameter Binding
+
+```
+@NamedQuery(
+    name = "Employee.findBySalary",
+    query = "from Employee e where e.salary > :sal"
+)
+```
+
+```java
+Query<Employee> query =
+        session.createNamedQuery("Employee.findBySalary", Employee.class);
+
+query.setParameter("sal", new BigDecimal("60000"));
+
+List<Employee> list = query.getResultList();
+```
+
+Parameter binding works exactly like normal HQL.
+
+---
+
+# 5. Named Query for UPDATE
+
+Define:
+
+```java
+@NamedQuery(
+    name = "Employee.updateBonus",
+    query = "update Employee e set e.bonus = :b where e.experience > :exp"
+)
+```
+
+Execute:
+
+```java
+Query<?> query =
+        session.createNamedQuery("Employee.updateBonus");
+
+query.setParameter("b", 8000.0);
+query.setParameter("exp", 5);
+
+int rows = query.executeUpdate();
+```
+
+---
+
+# 6. Named Query for DELETE
+
+Define:
+
+```java
+@NamedQuery(
+    name = "Employee.deleteInactive",
+    query = "delete from Employee e where e.isActive = false"
+)
+```
+
+Execute:
+
+```java
+Query<?> query =
+        session.createNamedQuery("Employee.deleteInactive");
+
+int rows = query.executeUpdate();
+```
+
+---
+
+# 7. Returning Specific Columns
+
+Define:
+
+```java
+@NamedQuery(
+    name = "Employee.findNames",
+    query = "select e.name from Employee e"
+)
+```
+
+Execute:
+
+```java
+Query<String> query =
+        session.createNamedQuery("Employee.findNames", String.class);
+
+List<String> names = query.getResultList();
+```
+
+---
+
+# 8. Aggregation in Named Query
+
+Define:
+
+```java
+@NamedQuery(
+    name = "Employee.countAll",
+    query = "select count(e) from Employee e"
+)
+```
+
+Execute:
+
+```java
+Query<Long> query =
+        session.createNamedQuery("Employee.countAll", Long.class);
+
+Long total = query.getSingleResult();
+```
+
+---
+
+# 9. Named Native Query (Short Mention)
+
+If we want SQL instead of HQL:
+
+```java
+@NamedNativeQuery(
+    name = "Employee.nativeAll",
+    query = "select * from employee",
+    resultClass = Employee.class
+)
+```
+
+Executed same way using `createNamedQuery()`.
+
+Use only when:
+
+* Complex DB-specific query needed.
+
+---
+
+# 10. Named Query vs Normal HQL
+
+| Normal HQL            | Named Query       |
+| --------------------- | ----------------- |
+| Written inside method | Defined in entity |
+| Can be dynamic        | Mostly static     |
+| Harder to maintain    | Centralized       |
+| Flexible              | Reusable          |
+
+---
+
+# 11. Advantages
+
+✅ Cleaner DAO code
+✅ Reusable
+✅ Centralized location
+✅ Parsed once at startup
+✅ Slight performance benefit
+
+---
+
+# 12. Disadvantages
+
+❌ Less dynamic
+❌ Cannot build conditions at runtime
+❌ Entity becomes crowded if too many queries
+
+---
+
+# 🎯 Summary
+
+> Normal HQL is good for dynamic queries.
+> Named Queries are good for fixed, reusable queries.
+
+---

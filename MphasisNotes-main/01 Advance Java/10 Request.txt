@@ -1,0 +1,292 @@
+
+# Request (Browser → Server)
+
+---
+
+## 1. What is an HTTP Request?
+
+### Simple Definition
+
+> An **HTTP Request** is a message sent by the browser (client) to the server to ask for some action.
+
+Every servlet works by **reading the HTTP request**.
+
+---
+
+## 2. Components of an HTTP Request
+
+An HTTP request mainly contains **four parts**:
+
+### 2.1 Request Line
+
+Contains:
+
+* HTTP Method (GET, POST, etc.)
+* URL
+* HTTP version
+
+Example:
+
+```text
+GET /greet?name=Amit HTTP/1.1
+```
+
+---
+
+### 2.2 Headers
+
+> Headers carry **additional information** about the request.
+
+Examples:
+
+* browser type
+* content type
+* cookies
+* authorization data
+
+👉 Automatically sent by browser
+👉 We usually **read them later**, not now
+
+---
+
+### 2.3 Request Body
+
+> Request body contains **actual data sent by client**.
+
+* Present mainly in **POST / PUT / PATCH**
+* Not visible in browser URL
+
+Example:
+
+```text
+userName=admin&password=admin123
+```
+
+---
+
+### 2.4 Query Parameters
+
+> Data sent as **key–value pairs** in URL.
+
+Example:
+
+```text
+name=Amit&city=Pune
+```
+
+👉 Used mainly with **GET requests**
+
+---
+
+## 3. How Data Is Sent from Browser to Server
+
+---
+
+## 3.1 Clicking a Link (URL Rewriting)
+
+### Rule
+
+=> Clicking a link **always sends a GET request**.
+
+### Example
+
+```html
+<a href="greet?name=Amit&city=Pune">Click</a>
+```
+
+### What Happens
+
+* Data is appended to URL
+* Data becomes **query parameters**
+* Visible in browser address bar
+
+---
+
+### On Server
+
+```java
+request.getParameter("name");
+request.getParameter("city");
+```
+
+👉 Data is sent as **key–value pairs**
+👉 Data comes as **String**
+
+---
+
+## 3.2 Submitting a Form
+
+### Rule
+
+=> Form submission can send **GET or POST** request.
+
+### Example
+
+```html
+<form method="post" action="login">
+```
+
+---
+
+### How Data Travels
+
+| Method | Data Location          |
+| ------ | ---------------------- |
+| GET    | URL (Query Parameters) |
+| POST   | Request Body           |
+
+---
+
+### Importance of Key–Value Pairs
+
+Form fields:
+
+```html
+<input type="text" name="userName">
+<input type="password" name="password">
+```
+
+Data sent as:
+
+```text
+userName=admin
+password=admin123
+```
+
+👉 `name` attribute becomes the **key**
+👉 Input value becomes the **value**
+
+---
+
+### Reading Data on Server
+
+#### Single Value
+
+```java
+String name = request.getParameter("userName");
+```
+
+#### Multiple Values (Checkbox, Multi-select)
+
+```java
+String[] skills = request.getParameterValues("skills");
+```
+
+👉 **getParameter()** → single value
+👉 **getParameterValues()** → multiple values
+
+This is **very important for real forms**.
+
+---
+
+## 3.3 Redirection
+
+### Meaning
+
+=> Server tells browser to make a **new request** to another URL.
+
+### Example
+
+```java
+response.sendRedirect("home.html");
+```
+
+### What Actually Happens
+
+1. Server sends redirect response
+2. Browser creates **new HTTP request**
+3. Browser sends request to new URL
+
+### Key Points
+
+* Old request is lost
+* New request is created
+* Always results in **GET request**
+
+---
+
+## 3.4 Sending Data Using JavaScript
+
+### Rule
+
+=> JavaScript can send **custom HTTP requests**.
+
+Possible methods:
+
+* GET
+* POST
+* PUT
+* PATCH
+* DELETE
+
+### Used in:
+
+* AJAX
+* REST APIs
+* Single Page Applications
+
+👉 Data can be sent in:
+
+* URL
+* Request body
+* JSON format
+
+👉 We’ll use this **later**, not now.
+
+---
+
+## 3.5 Browser Refresh
+
+### Rule
+
+=> Browser refresh **always sends a GET request**.
+
+Even if:
+
+* previous request was POST
+* form was submitted
+
+👉 This is why **duplicate submission problems** occur.
+
+---
+
+## 4. Quick Summary Table
+
+| Action                    | HTTP Method |
+| ------------------------- | ----------- |
+| Click link                | GET         |
+| Form submit (method=get)  | GET         |
+| Form submit (method=post) | POST        |
+| Redirect                  | GET         |
+| JavaScript call           | Any         |
+| Browser refresh           | GET         |
+
+---
+
+## 5. One-Line Memory Rules (Tell Them to Remember)
+
+* Link → **GET**
+
+* Form → **GET / POST**
+
+* Redirect → **GET**
+
+* Refresh → **GET**
+
+* JavaScript → **GET / POST / PUT / PATCH / DELETE**
+
+* Data always travels as **key–value pairs**
+
+* Data always travels in **String format**
+
+---
+
+## Key Takeaways
+
+* Browser sends HTTP request
+* Request contains method, headers, parameters, body
+* Servlet reads request data
+* Browser action decides HTTP method
+* Understanding request is the **base of web programming**
+
+---

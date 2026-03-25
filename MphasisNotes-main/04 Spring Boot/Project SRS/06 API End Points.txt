@@ -1,0 +1,125 @@
+
+# API End Points
+
+---
+
+# 🎯 Final API Summary (Quick View)
+
+| Module      | Endpoint Base       |
+| ----------- | ------------------- |
+| Auth        | /api/v1/auth        |
+| Users       | /api/v1/users       |
+| Categories  | /api/v1/categories  |
+| Products    | /api/v1/products    |
+| Orders      | /api/v1/orders      |
+| Order Items | /api/v1/order-items |
+| Actuator    | /actuator           |
+
+---
+
+# 🔐 Auth Module
+
+| Method | Endpoint              | Purpose           |
+| ------ | --------------------- | ----------------- |
+| POST   | /api/v1/auth/register | Register new user |
+| POST   | /api/v1/auth/login    | Login user        |
+
+---
+
+# 👤 Users Module
+
+| Method | Endpoint           | Purpose        |
+| ------ | ------------------ | -------------- |
+| GET    | /api/v1/users      | Get all users  |
+| GET    | /api/v1/users/{id} | Get user by ID |
+| PUT    | /api/v1/users/{id} | Update user    |
+| DELETE | /api/v1/users/{id} | Delete user    |
+
+---
+
+# 📂 Categories Module
+
+| Method | Endpoint                | Purpose            |
+| ------ | ----------------------- | ------------------ |
+| POST   | /api/v1/categories      | Create category    |
+| GET    | /api/v1/categories      | Get all categories |
+| GET    | /api/v1/categories/{id} | Get category by ID |
+| PUT    | /api/v1/categories/{id} | Update category    |
+| DELETE | /api/v1/categories/{id} | Delete category    |
+
+---
+
+# 📦 Products Module
+
+| Method | Endpoint              | Purpose           |
+| ------ | --------------------- | ----------------- |
+| POST   | /api/v1/products      | Create product    |
+| GET    | /api/v1/products      | Get all products  |
+| GET    | /api/v1/products/{id} | Get product by ID |
+| PUT    | /api/v1/products/{id} | Update product    |
+| DELETE | /api/v1/products/{id} | Delete product    |
+
+### 🔎 Product Filtering
+
+| Method | Endpoint                                     | Purpose               |
+| ------ | -------------------------------------------- | --------------------- |
+| GET    | /api/v1/products?category=Electronics        | Filter by category    |
+| GET    | /api/v1/products?minPrice=1000               | Filter by min price   |
+| GET    | /api/v1/products?minPrice=1000&maxPrice=5000 | Filter by price range |
+| GET    | /api/v1/products?name=mobile                 | Search by name        |
+
+### 🖼 Product Image
+
+| Method | Endpoint                    | Purpose              |
+| ------ | --------------------------- | -------------------- |
+| POST   | /api/v1/products/{id}/image | Upload product image |
+
+---
+
+# 🛒 Orders Module
+
+| Method | Endpoint                | Purpose            |
+| ------ | ----------------------- | ------------------ |
+| POST   | /api/v1/orders          | Place new order    |
+| GET    | /api/v1/orders          | Get all orders     |
+| GET    | /api/v1/orders/{id}     | Get order by ID    |
+| GET    | /api/v1/orders?userId=1 | Get orders by user |
+| DELETE | /api/v1/orders/{id}     | Cancel order       |
+
+---
+
+# 📦 Order Items Module (Optional Direct Access)
+
+| Method | Endpoint                      | Purpose              |
+| ------ | ----------------------------- | -------------------- |
+| GET    | /api/v1/order-items           | Get all order items  |
+| GET    | /api/v1/order-items/{id}      | Get order item by ID |
+| GET    | /api/v1/order-items?orderId=1 | Get items by order   |
+
+---
+
+# 🏥 Actuator Module
+
+| Method | Endpoint          | Purpose            |
+| ------ | ----------------- | ------------------ |
+| GET    | /actuator         | List endpoints     |
+| GET    | /actuator/health  | Application health |
+| GET    | /actuator/metrics | Metrics            |
+| GET    | /actuator/env     | Environment        |
+| GET    | /actuator/beans   | Beans              |
+
+---
+
+# 🧠 What This Structure Teaches
+
+✔ REST naming standards
+✔ Resource hierarchy
+✔ Filtering with query params
+✔ Path variables
+✔ Proper HTTP methods
+✔ Production-style API organization
+
+And visually — this looks like a serious backend system.
+
+---
+

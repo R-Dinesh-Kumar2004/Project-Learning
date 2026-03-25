@@ -1,0 +1,100 @@
+
+## 📘 Class Assignment: Student Registration & Display
+
+### 🎯 Objective
+
+Build a small web app that collects student data, processes it in a servlet, and displays it using JSP + JSTL + EL.
+
+---
+
+## 🧩 Functional Requirements
+
+### 1. Registration Form (HTML/JSP)
+
+Create a form to collect:
+
+* Name (text)
+* Age (number)
+* Gender (radio)
+* Skills (checkbox – multiple)
+* City (dropdown)
+
+Rules:
+
+* Form must use method="post"
+* Proper name attributes must be used
+
+---
+
+### 2. Servlet (`StudentServlet`)
+
+* Read form data using `getParameter / getParameterValues`
+* Create a Student class in a separate package
+* Create a `Student` object
+* Store it in **request scope**
+* Forward to a JSP using **RequestDispatcher.forward()**
+
+➡ Also add a condition:
+
+* If age < 18 → use **`response.sendRedirect()`** to `error.jsp`
+* Use URL Rewriting error.jsp?message=Registration is open to 18+ students
+* Fetch this message in error.jsp and and print it in red color
+
+---
+
+### 3. Display JSP (`result.jsp`)
+
+Must use **ALL of these**:
+
+#### JSP Tags
+
+* Scriptlet → to read request attribute
+* Expression → to print one value
+* Declaration → declare a helper method (e.g., uppercase name)
+
+#### JSTL
+
+* `<c:set>` → store student object
+* `<c:out>` → print values
+* `<c:forEach>` → display skills list
+
+---
+
+### 4. Bonus Flow (Mandatory)
+
+* Add a **Back to Form** link
+
+---
+
+## 🧠 What Students Must Demonstrate
+
+| Concept            | Where Used         |
+| ------------------ | ------------------ |
+| Servlet            | Controller         |
+| getParameter       | Name, Age          |
+| getParameterValues | Skills             |
+| RequestDispatcher  | Forward success    |
+| sendRedirect       | Validation failure |
+| JSP Scriptlet      | Read object        |
+| JSP Expression     | Print simple value |
+| JSP Declaration    | Utility method     |
+| JSTL set           | Store object       |
+| JSTL out           | Display safely     |
+| JSTL forEach       | List iteration     |
+
+---
+
+## 📝 Submission Rules
+
+* Proper naming conventions
+* No hard-coded values
+* Clear comments
+* Working flow required
+
+---
+
+## 🧠 One-line student instruction
+
+> *“You must show both Java-style JSP and JSTL-style JSP in the same page.”*
+
+---

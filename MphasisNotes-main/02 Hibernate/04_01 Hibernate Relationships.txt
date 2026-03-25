@@ -1,0 +1,431 @@
+
+# 🔷 Hibernate Relationships
+
+In real-world applications, tables are not isolated. They are connected using **foreign keys**.
+
+In Hibernate, relationships allow us to:
+
+* Map object references to foreign keys
+* Automatically manage insert/update/delete of related objects
+* Maintain object-level navigation instead of writing joins manually
+
+Hibernate supports:
+
+| Relationship Type | Meaning                                        |
+| ----------------- | ---------------------------------------------- |
+| One-to-One        | One entity related to exactly one other entity |
+| One-to-Many       | One entity related to multiple entities        |
+| Many-to-Many      | Multiple entities related to multiple entities |
+
+Hibernate uses:
+
+* `@OneToOne`
+* `@OneToMany`
+* `@ManyToOne`
+* `@ManyToMany`
+* `@JoinColumn`
+* `@JoinTable`
+
+---
+
+# 1. One-to-One
+
+## Example: Employee ↔ Laptop
+
+One Employee owns one Laptop.
+
+---
+
+## 🟢 Target Database Schema
+
+### employee
+
+| id | name | laptop_id |
+| -- | ---- | --------- |
+| 1  | Amit | 101       |
+| 2  | Neha | 102       |
+
+### laptop
+
+| id  | brand | serial_no |
+| --- | ----- | --------- |
+| 101 | Dell  | DELL12345 |
+| 102 | HP    | HPLR08792 |
+
+👉 Foreign key: `employee.laptop_id`
+
+---
+
+## 🟢 Entity Classes
+
+### Employee.java
+
+```java
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private int id;
+
+    private String name;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "laptop_id")
+    private Laptop laptop;
+
+    // getters & setters
+}
+```
+
+---
+
+### Laptop.java
+
+```java
+@Entity
+public class Laptop {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    private String brand;
+
+    @Column(name = "serial_no")
+    private String serialNo;
+
+    // getters & setters
+}
+```
+
+---
+
+## 🟢 CRUD Operations
+
+### Save
+
+```java
+public void saveEmployee(Session session) {
+
+    Laptop laptop = new Laptop();
+    laptop.setBrand("Dell");
+    laptop.setSerialNo("DELL12345");
+
+    Employee emp = new Employee();
+    emp.setName("Amit");
+    emp.setLaptop(laptop);
+
+    session.persist(emp);
+}
+```
+
+---
+
+### Read
+
+```java
+public Employee getEmployee(Session session, int id) {
+    return session.get(Employee.class, id);
+}
+```
+
+---
+
+### Update
+
+```java
+public void updateLaptopBrand(Session session, int empId) {
+
+    Employee emp = session.get(Employee.class, empId);
+    emp.getLaptop().setBrand("HP");
+}
+```
+
+---
+
+### Delete
+
+```java
+public void deleteEmployee(Session session, int id) {
+
+    Employee emp = session.get(Employee.class, id);
+    session.remove(emp);
+}
+```
+
+Cascade ALL → Laptop is also deleted.
+
+---
+
+# 2. One-to-Many
+
+## Example: Student → Certificate
+
+One Student can have multiple Certificates.
+
+---
+
+## 🟢 Target Database Schema
+
+### student
+
+| id | name  |
+| -- | ----- |
+| 1  | Rahul |
+
+### certificate
+
+| id | title | fees | student_id |
+| -- | ----- | ---- | ---------- |
+| 10 | Java  | 5000 | 1          |
+| 11 | React | 6000 | 1          |
+
+👉 Foreign key: `certificate.student_id`
+
+---
+
+## 🟢 Entity Classes
+
+### Student.java
+
+```java
+@Entity
+public class Student {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "student",
+               cascade = CascadeType.ALL)
+    private List<Certificate> certificates;
+
+    // getters & setters
+}
+```
+
+---
+
+### Certificate.java
+
+```java
+@Entity
+public class Certificate {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    private String title;
+
+    private double fees;
+
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+
+    // getters & setters
+}
+```
+
+---
+
+## 🟢 CRUD Operations
+
+### Save
+
+```java
+public void saveStudent(Session session) {
+
+    Student s = new Student();
+    s.setName("Rahul");
+
+    Certificate c1 = new Certificate();
+    c1.setTitle("Java");
+    c1.setFees(5000);
+    c1.setStudent(s);
+
+    Certificate c2 = new Certificate();
+    c2.setTitle("React");
+    c2.setFees(6000);
+    c2.setStudent(s);
+
+    s.setCertificates(Arrays.asList(c1, c2));
+
+    session.persist(s);
+}
+```
+
+---
+
+### Read
+
+```java
+public Student getStudent(Session session, int id) {
+    return session.get(Student.class, id);
+}
+```
+
+---
+
+### Delete
+
+```java
+public void deleteStudent(Session session, int id) {
+
+    Student s = session.get(Student.class, id);
+    session.remove(s);
+}
+```
+
+Cascade ALL → Certificates also deleted.
+
+---
+
+# 3. Many-to-Many
+
+## Example: Trainee ↔ Course
+
+One Trainee can enroll in many Courses.
+One Course can have many Trainees.
+
+---
+
+## 🟢 Target Database Schema
+
+### trainee
+
+| id | name  |
+| -- | ----- |
+| 1  | Karan |
+
+### course
+
+| id | title | fees |
+| -- | ----- | ---- |
+| 10 | Java  | 7000 |
+| 11 | React | 8000 |
+
+### trainee_course (Join Table)
+
+| trainee_id | course_id |
+| ---------- | --------- |
+| 1          | 10        |
+| 1          | 11        |
+
+👉 Extra join table required.
+
+---
+
+## 🟢 Entity Classes
+
+### Trainee.java
+
+```java
+@Entity
+public class Trainee {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    private String name;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "trainee_course",
+        joinColumns = @JoinColumn(name = "trainee_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private List<Course> courses;
+
+    // getters & setters
+}
+```
+
+---
+
+### Course.java
+
+```java
+@Entity
+public class Course {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    private String title;
+
+    private double fees;
+
+    @ManyToMany(mappedBy = "courses")
+    private List<Trainee> trainees;
+
+    // getters & setters
+}
+```
+
+---
+
+## 🟢 CRUD Operations
+
+### Save
+
+```java
+public void saveTrainee(Session session) {
+
+    Course c1 = new Course();
+    c1.setTitle("Java");
+    c1.setFees(7000);
+
+    Course c2 = new Course();
+    c2.setTitle("React");
+    c2.setFees(8000);
+
+    Trainee t = new Trainee();
+    t.setName("Karan");
+    t.setCourses(Arrays.asList(c1, c2));
+
+    session.persist(t);
+}
+```
+
+---
+
+### Read
+
+```java
+public Trainee getTrainee(Session session, int id) {
+    return session.get(Trainee.class, id);
+}
+```
+
+---
+
+### Delete
+
+```java
+public void deleteTrainee(Session session, int id) {
+
+    Trainee t = session.get(Trainee.class, id);
+    session.remove(t);
+}
+```
+
+Cascade ALL → Courses also deleted (important behavior to explain in class ⚠).
+
+---
+
+# 🔥 Final Concept Summary
+
+| Type         | Foreign Key Location | Extra Table |
+| ------------ | -------------------- | ----------- |
+| One-to-One   | One side             | No          |
+| One-to-Many  | Many side            | No          |
+| Many-to-Many | Join Table           | Yes         |
+
+---

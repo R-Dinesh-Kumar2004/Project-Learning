@@ -1,0 +1,145 @@
+Hibernate Class Example
+=======================
+
+1. Hibernate dependencies
+
+- hibernate-core (version 6.5.2.Final)
+- mysql-connector-java (version 8.0.33)
+
+2. Hibernate XML Configuration file - hibernate.cfg.xml
+
+<hibernate-configuration>
+	
+	<session-factory>
+	
+		<property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+		<property name="connection.url">jdbc:mysql://localhost:3306/hibernate_demo</property>
+		<property name="connection.username">root</property>
+		<property name="connection.password">1234</property>
+
+		<property name="dialect">org.hibernate.dialect.MySQL8Dialect</property>  
+		<property name="hbm2ddl.auto">update</property>
+		<property name="show_sql">true</property>
+		<property name="format_sql">true</property>
+		<mapping class="com.hibernate.pojo.Student"/>
+	
+	</session-factory>
+
+</hibernate-configuration>
+
+3. Demo Table
+
+`employee` (
+   `id` int NOT NULL AUTO_INCREMENT,
+   `active` bit(1) NOT NULL,
+   `emp_city` varchar(255) DEFAULT NULL,
+   `emp_country` varchar(255) DEFAULT NULL,
+   `emp_state` varchar(255) DEFAULT NULL,
+   `bonus` double NOT NULL,
+   `experience` int NOT NULL,
+   `grade` char(1) DEFAULT NULL,
+   `joining_date` date DEFAULT NULL,
+   `name` varchar(100) DEFAULT NULL,
+   `salary` decimal(7,2) DEFAULT NULL,
+   PRIMARY KEY (`id`)
+ )
+ 
+4. Special Annotation
+@Embedded
+	
+	
+@AttributeOverrides({ 
+	@AttributeOverride(name = "city", column = @Column(name = "emp_city")),
+	@AttributeOverride(name = "state", column = @Column(name = "emp_state")),
+	@AttributeOverride(name = "country", column = @Column(name = "emp_country"))
+})
+private Address address;
+
+
+
+---
+Inheritance
+-----------
+public class Employee {
+	private int id;
+	private String name;	
+}
+
+public class RegularEmployee extends Employee {
+	private float salary;
+	private int bonus;
+}
+
+public class ContractEmployee extends Employee {
+	private float hourlyRate;
+	private String contractDuration;
+}
+
+1. Single class/table per hierarchy
+
+@Entity
+@Table(name = "101employee")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", 
+discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue(value = "employee")
+class Employee {}
+
+@Entity
+@DiscriminatorValue("regular-employee")
+public class RegularEmployee extends Employee{}
+
+@Entity
+@DiscriminatorValue("contract-employee")
+public class ContractEmployee extends Employee{}
+
+2. Table per class / Table per concrete class
+
+@Entity
+@Table(name = "103employee")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS) 
+class Employee103{}
+
+---
+
+@Entity
+@Table(name="103regular_employee")
+@AttributeOverrides({
+	@AttributeOverride(name="id", column = @Column(name = "id")),
+	@AttributeOverride(name="name", column = @Column(name = "name"))
+})
+public class RegularEmployee103 extends Employee103 {}
+
+@Entity
+@Table(name="103contract_employee")  
+@AttributeOverrides({  
+    @AttributeOverride(name="id", column=@Column(name="id")),  
+    @AttributeOverride(name="name", column=@Column(name="name"))  
+}) 
+public class ContractEmployee103 extends Employee103 {}
+
+---
+
+3. Joined/table per subclass
+
+@Entity
+@Table(name = "103employee")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Employee {}
+
+@Entity
+@Table(name="103contract_employee")  
+@PrimaryKeyJoinColumn(name="id")
+public class ContractEmployee extends Employee {}
+
+@Entity
+@Table(name="103regular_employee")
+@PrimaryKeyJoinColumn(name="id")
+public class RegularEmployee extends Employee {}
+
+
+
+
+
+
+

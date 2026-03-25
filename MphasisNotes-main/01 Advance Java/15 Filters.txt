@@ -1,0 +1,278 @@
+
+# Filters in Java Web Applications
+
+---
+
+## 1. What is a Filter?
+
+### Simple Definition
+
+=> A *Filter* is a component that *intercepts a request or response* before it reaches a servlet or before it goes back to the client.
+
+👉 Filter sits *in between*:
+
+* Browser → Servlet
+* Servlet → Browser
+
+---
+
+## 2. Why Do We Need Filters? (Use Cases)
+
+Filters are used when we want to apply *common logic* to many requests.
+
+### Common Real-World Use Cases
+
+* Authentication check (user logged in or not)
+* Logging requests
+* Input validation
+* Encoding (UTF-8)
+* Security checks
+
+👉 Instead of writing the same code in *every servlet*, we use a *filter*.
+
+---
+
+## 3. Web Container Request Cycle (With Filters)
+
+Let’s see *how a request actually flows*.
+
+### Request Flow (Simplified)
+
+```
+Browser
+   ↓
+Filter (Pre-processing)
+   ↓
+Servlet
+   ↓
+Filter (Post-processing)
+   ↓
+Browser
+```
+
+---
+
+### Explanation
+
+1. Browser sends request
+2. Web container (e.g. *Apache Tomcat*) receives request
+3. Container checks if any *filter* is mapped
+4. Filter executes *before servlet*
+5. Servlet processes request
+6. Filter executes *after servlet*
+7. Response is sent to browser
+
+👉 Filter runs *both before and after* servlet logic.
+
+---
+
+## 4. Filter API (Important Interfaces & Methods)
+
+Filters are part of the *Servlet API*.
+
+---
+
+### 4.1 Filter Interface
+
+```java
+public interface Filter
+```
+
+A class becomes a filter by:
+
+* implementing `Filter` interface
+
+---
+
+### 4.2 Filter Lifecycle Methods
+
+A filter has *three lifecycle methods*:
+
+---
+
+#### 🔹 `init()`
+
+```java
+public void init(FilterConfig config)
+```
+
+init() of a Filter is called by the web container when the web application is started (deployed).
+
+* Called *once*
+* Used for initialization
+* Similar to servlet `init()`
+
+It is NOT called:
+
+* per request
+* per user
+* per servlet call
+
+Why Does init() Exist? (Use Case)
+
+init() is used for:
+* reading filter configuration
+* loading resources
+* initializing variables
+* setting up logging
+
+---
+
+#### 🔹 `doFilter()` (MOST IMPORTANT)
+
+```java
+public void doFilter(ServletRequest request,
+                     ServletResponse response,
+                     FilterChain chain)
+```
+
+* Called *for every request*
+* Contains filter logic
+* Decides whether request should continue
+
+👉 `chain.doFilter()` passes control to next filter / servlet
+
+---
+
+#### 🔹 `destroy()`
+
+```java
+public void destroy()
+```
+
+* Called once
+* Used for cleanup
+
+---
+
+## 5. Developing a Filter Class
+
+### Step 1. Create a Filter Class
+
+```java
+public class AuthFilter implements Filter {
+```
+
+---
+
+### Step 2. Implement Methods
+
+```java
+public class AuthFilter implements Filter {
+
+    public void init(FilterConfig config) {
+        System.out.println("Filter initialized");
+    }
+
+    public void doFilter(ServletRequest request,
+                         ServletResponse response,
+                         FilterChain chain)
+            throws IOException, ServletException {
+
+        // Pre-processing
+        System.out.println("Before Servlet");
+
+        chain.doFilter(request, response); // pass request
+
+        // Post-processing
+        System.out.println("After Servlet");
+    }
+
+    public void destroy() {
+        System.out.println("Filter destroyed");
+    }
+}
+```
+
+---
+
+### ✅ Why `chain.doFilter()` is critical
+
+* If not called → request *stops*
+* Servlet will *never execute*
+
+---
+
+## 6. Configuring a Filter in `web.xml`
+
+Filters must be *registered and mapped*.
+
+---
+
+### 6.1 Filter Definition
+
+```xml
+<filter>
+    <filter-name>AuthFilter</filter-name>
+    <filter-class>com.app.filter.AuthFilter</filter-class>
+</filter>
+```
+
+---
+
+### 6.2 Filter Mapping
+
+```xml
+<filter-mapping>
+    <filter-name>AuthFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+
+---
+
+### What This Means
+
+* Filter will run for *all requests*
+* Can also map to:
+
+  * specific servlet
+  * specific URL pattern
+
+Example:
+
+```xml
+<url-pattern>/secure/*</url-pattern>
+```
+
+---
+
+## 7. Filter vs Servlet (Very Important)
+
+| Aspect         | Filter               | Servlet         |
+| -------------- | -------------------- | --------------- |
+| Purpose        | Intercept request    | Process request |
+| Position       | Before/After servlet | Main processor  |
+| Common logic   | Yes                  | No              |
+| Business logic | ❌                    | ✅               |
+
+---
+
+## 8. One-Line Memory Rules (Very Effective)
+
+* Filter intercepts requests
+* Filter runs before servlet
+* Filter can modify request/response
+* `chain.doFilter()` is mandatory
+* Filters reduce duplicate code
+
+---
+
+## 9. When Filters Are Created & Called
+
+* Filter is created *once*
+* `init()` → once
+* `doFilter()` → every request
+* `destroy()` → once at shutdown
+
+---
+
+## Key Takeaways
+
+* Filters are container-managed
+* Used for cross-cutting concerns
+* Sit between browser and servlet
+* Essential for real applications
+* Foundation for Spring Security concepts
+
+---

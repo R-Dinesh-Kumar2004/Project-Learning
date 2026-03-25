@@ -1,0 +1,243 @@
+
+# 📘 Inheritance in Hibernate
+
+##🎯 What is Inheritance?
+
+Inheritance allows one class to acquire properties and behavior of another class.
+
+
+## Base Classes
+
+```java
+public class Employee {
+    private int id;
+    private String name;    
+}
+```
+
+```java
+public class RegularEmployee extends Employee {
+    private float salary;
+    private int bonus;
+}
+```
+
+```java
+public class ContractEmployee extends Employee {
+    private float hourlyRate;
+    private String contractDuration;
+}
+```
+
+---
+
+# 🧠 Why Inheritance Mapping Is Needed?
+
+Hibernate supports mapping this object-oriented inheritance to relational tables.
+
+In Java:
+* OOP supports inheritance, but relational databases do NOT.
+* `RegularEmployee` and `ContractEmployee` inherit `id` and `name`.
+
+In Database:
+
+* Tables do NOT support inheritance.
+* So Hibernate provides **3 strategies** to map inheritance.
+
+---
+
+🔹 Three Types of Inheritance in Hibernate
+
+1. SINGLE_TABLE
+2. JOINED
+3. TABLE_PER_CLASS
+
+# Alternative Names
+
+| JPA Strategy    | Alternative Name         | What It Means                  |
+| --------------- | ------------------------ | ------------------------------ |
+| SINGLE_TABLE    | Table Per Hierarchy      | One table for entire hierarchy |
+| JOINED          | Table Per Subclass       | One table per class, joined    |
+| TABLE_PER_CLASS | Table Per Concrete Class | One table per concrete class   |
+
+
+# 🔹 1. SINGLE_TABLE Strategy
+
+## 📌 Annotation
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "emp_type")
+public abstract class Employee {
+```
+
+In child classes:
+
+```java
+@Entity
+@DiscriminatorValue("REGULAR")
+public class RegularEmployee extends Employee { }
+```
+
+```java
+@Entity
+@DiscriminatorValue("CONTRACT")
+public class ContractEmployee extends Employee { }
+```
+
+---
+
+## 📊 Database Structure
+
+Only ONE table:
+
+### employee
+
+| id | name | salary | bonus | hourlyRate | contractDuration | emp_type |
+| -- | ---- | ------ | ----- | ---------- | ---------------- | -------- |
+
+Example rows:
+
+| 1 | Rahul | 50000 | 5000 | NULL | NULL     | REGULAR  |
+| 2 | Amit  | NULL  | NULL | 500  | 6 Months | CONTRACT |
+
+---
+
+## ✅ Advantages
+
+✔ Fastest
+✔ No joins
+✔ Simple structure
+
+## ❌ Disadvantages
+
+✖ Many NULL columns
+✖ Poor normalization
+
+---
+
+# 🔹 2. JOINED Strategy
+
+## 📌 Annotation
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Employee { }
+```
+
+---
+
+## 📊 Database Structure
+
+### employee (Parent table)
+
+| id | name |
+
+### regularemployee
+
+| id | salary | bonus |
+
+### contractemployee
+
+| id | hourlyRate | contractDuration |
+
+When fetching `RegularEmployee`, Hibernate performs JOIN.
+
+---
+
+## ✅ Advantages
+
+✔ No NULL columns
+✔ Proper normalization
+✔ Cleaner DB design
+
+## ❌ Disadvantages
+
+✖ Slower than SINGLE_TABLE
+✖ Requires joins
+
+---
+
+# 🔹 3. TABLE_PER_CLASS Strategy
+
+## 📌 Annotation
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class Employee { }
+```
+
+---
+
+## 📊 Database Structure
+
+### regularemployee
+
+| id | name | salary | bonus |
+
+### contractemployee
+
+| id | name | hourlyRate | contractDuration |
+
+No parent table created.
+
+---
+
+## ✅ Advantages
+
+✔ No joins
+✔ No NULL values
+
+## ❌ Disadvantages
+
+✖ Data duplication (name repeated)
+✖ Rarely used in real projects
+
+---
+
+# 📊 Strategy Comparison
+
+| Strategy        | Tables | Performance          | Null Values | Joins |
+| --------------- | ------ | -------------------- | ----------- | ----- |
+| SINGLE_TABLE    | 1      | Fastest              | Yes         | No    |
+| JOINED          | 3      | Medium               | No          | Yes   |
+| TABLE_PER_CLASS | 2      | Slow for polymorphic | No          | No    |
+
+---
+
+# 🎯 Polymorphic Query Example
+
+```java
+List<Employee> list = session.createQuery("from Employee", Employee.class).list();
+```
+
+Hibernate will:
+
+* SINGLE_TABLE → Simple select
+* JOINED → Select with joins
+* TABLE_PER_CLASS → UNION query
+
+Important teaching moment.
+
+---
+
+# 🧠 When to Use What?
+
+* Use **SINGLE_TABLE** when performance is priority.
+* Use **JOINED** when database normalization is important.
+* Avoid **TABLE_PER_CLASS** in most real-world projects.
+
+---
+
+# 🎓 Important
+
+> Java supports inheritance.
+> Database does not.
+> Hibernate provides 3 strategies to bridge this gap.
+
+Clear. Elegant. Done.
+
+---

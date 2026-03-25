@@ -1,0 +1,338 @@
+
+# 1. What is Hibernate?
+
+
+## 📌 Introduction
+
+**Hibernate** is an open-source ORM framework for Java that simplifies database interaction by mapping Java objects to database tables.
+
+Instead of writing SQL manually (like in JDBC), Hibernate allows us to work with **Java objects**, and it handles SQL generation internally.
+
+👉 It belongs to the ORM layer in Java Enterprise applications.
+
+---
+
+# 2. Advantages of Hibernate Compared to JDBC
+
+| Feature                | JDBC                | Hibernate                          |
+| ---------------------- | ------------------- | ---------------------------------- |
+| SQL Writing            | Manual SQL required | SQL auto-generated                 |
+| Boilerplate Code       | More                | Very less                          |
+| Object Mapping         | Manual              | Automatic (ORM)                    |
+| Portability            | DB-specific SQL     | Database independent               |
+| Caching                | Not available       | First-level & Second-level caching |
+| Transaction Management | Manual              | Built-in support                   |
+| Exception Handling     | Checked Exceptions  | Unchecked (HibernateException)     |
+
+### ✅ Why Hibernate is preferred:
+
+* Reduces code size
+* Increases productivity
+* Minimizes SQL errors
+* Handles relationships automatically
+* Provides caching
+
+---
+
+# 3. ORM (Object Relational Mapping)
+
+## 📌 What is ORM?
+
+ORM is a technique that maps:
+
+| Java        | Database |
+| ----------- | -------- |
+| Class       | Table    |
+| Object      | Row      |
+| Property    | Column   |
+| Primary Key | @Id      |
+
+### Example:
+
+```java
+class Student {
+    int id;
+    String name;
+}
+```
+
+Mapped to:
+
+```
+STUDENT table
+-------------
+ID | NAME
+```
+
+ORM eliminates impedance mismatch between object-oriented and relational models.
+
+---
+
+# 4. Hibernate Architecture
+
+## 📌 Core Components
+
+1. **Configuration**
+2. **SessionFactory**
+3. **Session**
+4. **Transaction**
+5. **Query**
+6. **Database**
+
+### 🔹 Flow:
+
+```
+Configuration → SessionFactory → Session → Transaction → Database
+```
+
+### 🔹 Component Explanation:
+
+### 1. Configuration
+
+* Loads `hibernate.cfg.xml`
+* Reads DB properties and mapping files
+
+### 2. SessionFactory
+
+* Heavy object
+* Created once per database
+* Thread-safe
+* Creates Session objects
+
+### 3. Session
+
+* Light-weight
+* Represents connection with DB
+* Used for CRUD operations
+* Not thread-safe
+
+### 4. Transaction
+
+* Ensures data consistency
+* commit() / rollback()
+
+---
+
+# 5. Hibernate Resources
+
+## Required Files:
+
+1. `hibernate.cfg.xml`
+2. Mapping file (`Student.hbm.xml`) OR annotations
+3. Entity class
+4. Hibernate core libraries
+5. Database driver
+
+* The name `hibernate.cfg.xml` is compulsory only if we call configure()
+
+---
+
+# 6. Object Life Cycle in Hibernate
+
+Hibernate objects have 4 states:
+
+### 1. Transient
+
+* Object created using `new`
+* Not associated with session
+* No DB record
+
+### 2. Persistent
+
+* Associated with session
+* Record exists in DB
+
+### 3. Detached
+
+* Was persistent
+* Session closed
+* Still has DB identity
+
+### 4. Removed
+
+* Deleted from DB
+
+---
+
+# 7. CRUD Operations Using Session Methods (XML Mapping)
+
+## 🔹 Save (Create)
+
+```java
+Session session = sessionFactory.openSession();
+Transaction tx = session.beginTransaction();
+
+session.save(student);
+
+tx.commit();
+session.close();
+```
+
+---
+
+## 🔹 Read
+
+```java
+Student s = session.get(Student.class, 1);
+```
+
+---
+
+## 🔹 Update
+
+```java
+student.setName("Rahul");
+session.update(student);
+```
+
+---
+
+## 🔹 Delete
+
+```java
+session.delete(student);
+```
+
+---
+
+# 8. CRUD Using Annotations
+
+## Entity Class
+
+```java
+@Entity
+@Table(name="student")
+public class Student {
+
+    @Id
+    @GeneratedValue
+    private int id;
+
+    @Column(name="name")
+    private String name;
+}
+```
+
+### The rest of CRUD code remains same.
+
+---
+
+# 9. Problem of Granularity Using Annotations
+
+## 📌 What is Granularity Problem?
+
+Granularity refers to mapping **complex objects**.
+
+Example:
+
+```java
+class Address {
+    String city;
+    String state;
+}
+```
+
+If embedded in Student:
+
+```java
+@Embedded
+private Address address;
+```
+
+### Problem:
+
+* Too many fields in one table
+* Repeated columns
+* Hard to normalize
+
+Solution:
+
+* Use `@Embeddable`
+* OR create separate entity with relationship mapping
+
+---
+
+# 🔟 Problem of Inheritance Using Annotations
+
+Hibernate supports 3 inheritance strategies:
+
+## 1. SINGLE_TABLE
+
+```java
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+```
+
+✔ Fast
+❌ Many NULL columns
+
+---
+
+## 2. JOINED
+
+```java
+@Inheritance(strategy = InheritanceType.JOINED)
+```
+
+✔ Normalized
+❌ More joins (slow)
+
+---
+
+## 3. TABLE_PER_CLASS
+
+```java
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+```
+
+✔ Independent tables
+❌ Union queries performance issue
+
+---
+
+# 11. Problem of Relationship Using Annotations
+
+## Types of Relationships:
+
+1. One-to-One
+2. One-to-Many
+3. Many-to-One
+4. Many-to-Many
+
+---
+
+## Example: One-To-Many
+
+```java
+@OneToMany(mappedBy="student")
+private List<Course> courses;
+```
+
+### Common Problems:
+
+### ❌ N+1 Select Problem
+
+Multiple queries fired instead of single join.
+
+### ❌ Cascade Issues
+
+If cascade not defined properly, child objects not saved.
+
+Solution:
+
+* Use `cascade = CascadeType.ALL`
+
+---
+
+# 🔥 Summary for Classroom
+
+Hibernate:
+
+* Is ORM framework
+* Reduces JDBC complexity
+* Uses SessionFactory & Session
+* Has object states
+* Supports XML & Annotation mapping
+* Handles inheritance & relationships
+* But has performance considerations
+
+---

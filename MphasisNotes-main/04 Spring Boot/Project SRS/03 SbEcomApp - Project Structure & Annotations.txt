@@ -1,0 +1,422 @@
+
+ # SbEcomApp Project Structure & Annotations
+
+---
+
+# Package Structure
+
+Types of package structure we use in enterprise:
+
+1. Entitity based packaging
+
+sb.ecom.app (base package)
+	.user
+		UserController
+		UserService
+		UserRepository
+	.product
+		ProductController
+		ProductService
+		ProductRepository
+
+* 2 package, 3 classes per package
+
+---
+
+2. Layer based packaging
+
+sb.ecom.app (base package)
+	.controller
+		UserController
+		ProductController
+	.service
+		UserService
+		ProductService
+	.repository
+		UserRepository
+		ProductRepository
+
+* 3 package, 2 classes per package
+
+---
+	
+3. Entity + Layer based packaging
+
+sb.ecom.app
+	.product
+		.controller
+			ProductController
+		.service
+			ProductService
+		.repository
+			ProductRepository
+	.user
+		.controller
+			UserController
+		.service
+			UserService
+		.repository
+			UserRepository
+			
+* 6 packages, 1 classes per package
+
+Note:
+** All the above packaging structures are standard.
+** It depends on the business requirement as to which packaging structure will suit more.
+
+We will follow layer-based packaging (2nd one)
+
+---
+
+```
+SbEcomApp
+│
+├── src/main/java/sb.ecom.app
+│   │
+│   ├── SbEcomAppApplication.java
+│   │
+│   ├── config/
+│   │     ├── AppConfig.java
+│   │     ├── SwaggerConfig.java
+│   │     ├── AopConfig.java
+│   │
+│   ├── aspect/
+│   │     ├── LoggingAspect.java
+│   │
+│   ├── controller/
+│   │     ├── AuthController.java
+│   │     ├── UserController.java
+│   │     ├── CategoryController.java
+│   │     ├── ProductController.java
+│   │     ├── OrderController.java
+│   │
+│   ├── service/
+│   │     ├── UserService.java
+│   │     ├── CategoryService.java
+│   │     ├── ProductService.java
+│   │     ├── OrderService.java
+│   │
+│   ├── service/impl/
+│   │     ├── UserServiceImpl.java
+│   │     ├── CategoryServiceImpl.java
+│   │     ├── ProductServiceImpl.java
+│   │     ├── OrderServiceImpl.java
+│   │
+│   ├── repository/
+│   │     ├── UserRepository.java
+│   │     ├── CategoryRepository.java
+│   │     ├── ProductRepository.java
+│   │     ├── OrderRepository.java
+│   │     ├── OrderItemRepository.java
+│   │
+│   ├── entity/
+│   │     ├── User.java
+│   │     ├── Category.java
+│   │     ├── Product.java
+│   │     ├── Order.java
+│   │     ├── OrderItem.java
+│   │
+│   ├── dto/
+│   │     ├── ApiResponse.java
+│   │     ├── RegisterRequestDTO.java
+│   │     ├── LoginRequestDTO.java
+│   │     ├── CategoryRequestDTO.java
+│   │     ├── ProductRequestDTO.java
+│   │     ├── OrderRequestDTO.java
+│   │     ├── OrderItemRequestDTO.java
+│   │
+│   ├── exception/
+│   │     ├── ResourceNotFoundException.java
+│   │     ├── InvalidCredentialsException.java
+│   │     ├── GlobalExceptionHandler.java
+│   │
+│   ├── util/
+│   │     ├── FileUploadUtil.java
+│   │
+│   ├── health/
+│   │     ├── EcomHealthIndicator.java
+│   │
+│   ├── runner/
+│   │     ├── DataInitializer.java
+│
+├── src/main/resources/
+│   ├── application.properties
+│   ├── data.sql
+│   ├── static/
+│   │     └── images/
+│   └── templates/
+│
+└── pom.xml
+```
+
+---
+
+# Base Annotations
+
+# 🏛 MAIN APPLICATION
+
+## 📁 SbEcomAppApplication.java
+
+```java
+@SpringBootApplication
+```
+
+---
+
+# ⚙ CONFIG PACKAGE
+
+## 📁 AppConfig.java
+
+```java
+@Configuration
+@Bean   (for password encoder bean)
+```
+
+---
+
+## 📁 SwaggerConfig.java
+
+```java
+@Configuration
+@Bean   (for OpenAPI bean)
+```
+
+---
+
+## 📁 AopConfig.java
+
+```java
+@Configuration
+@EnableAspectJAutoProxy
+```
+
+---
+
+# 🔁 ASPECT PACKAGE
+
+## 📁 LoggingAspect.java
+
+```java
+@Aspect
+@Component
+```
+
+---
+
+# 🌍 CONTROLLER PACKAGE
+
+(All controllers)
+
+## 📁 AuthController.java
+
+## 📁 UserController.java
+
+## 📁 CategoryController.java
+
+## 📁 ProductController.java
+
+## 📁 OrderController.java
+
+```java
+@RestController
+@RequestMapping("/api/v1/...")
+@RequiredArgsConstructor   (if using Lombok)
+```
+
+Optional:
+
+```java
+@Validated
+```
+
+---
+
+# 🧠 SERVICE PACKAGE
+
+## 📁 Interfaces (UserService, ProductService, etc.)
+
+❌ No annotation
+
+---
+
+## Implementation Classes
+
+## 📁 UserServiceImpl.java
+
+## 📁 CategoryServiceImpl.java
+
+## 📁 ProductServiceImpl.java
+
+## 📁 OrderServiceImpl.java
+
+```java
+@Service
+@RequiredArgsConstructor () (If using Lombok)
+@Transactional   (at class level OR method level in OrderService)
+```
+
+For OrderService:
+
+```java
+@Transactional   // Important for order placement
+```
+
+---
+
+# 🗃 REPOSITORY PACKAGE
+
+## 📁 UserRepository.java
+
+## 📁 CategoryRepository.java
+
+## 📁 ProductRepository.java
+
+## 📁 OrderRepository.java
+
+## 📁 OrderItemRepository.java
+
+```java
+@Repository   (optional but recommended)
+public interface XRepository extends JpaRepository<X, Long>
+```
+
+---
+
+# 🏛 ENTITY PACKAGE
+
+---
+
+## 📁 User.java
+
+## 📁 Category.java
+
+## 📁 Product.java
+
+## 📁 Order.java
+
+## 📁 OrderItem.java
+
+
+```java
+@Entity
+@Table(name = "users/categories/products/orders/order_items")
+@Data or @Getter/@Setter (If using Lombok)
+@NoArgsConstructor (If using Lombok)
+@AllArgsConstructor (If using Lombok)
+```
+
+---
+
+# 📦 DTO PACKAGE
+
+(All DTOs)
+
+## 📁 ApiResponse.java
+
+## 📁 RegisterRequestDTO.java
+
+## 📁 LoginRequestDTO.java
+
+## 📁 CategoryRequestDTO.java
+
+## 📁 ProductRequestDTO.java
+
+## 📁 OrderRequestDTO.java
+
+## 📁 OrderItemRequestDTO.java
+
+```java
+@Data (If using Lombok)
+@NoArgsConstructor (If using Lombok)
+@AllArgsConstructor (If using Lombok)
+```
+
+---
+
+# ⚠ EXCEPTION PACKAGE
+
+## 📁 ResourceNotFoundException.java
+
+## 📁 InvalidCredentialsException.java
+
+(No annotation needed — just extend RuntimeException)
+
+---
+
+## 📁 GlobalExceptionHandler.java
+
+```java
+@RestControllerAdvice
+```
+
+Inside methods:
+
+```java
+@ExceptionHandler(...)
+```
+
+---
+
+# 🏥 HEALTH PACKAGE
+
+## 📁 EcomHealthIndicator.java
+
+```java
+@Component
+```
+
+Implements:
+
+```java
+HealthIndicator
+```
+
+---
+
+# 🚀 RUNNER PACKAGE
+
+## 📁 DataInitializer.java
+
+```java
+@Component
+```
+
+Implements:
+
+```java
+CommandLineRunner
+```
+
+---
+
+# 📁 UTIL PACKAGE
+
+## 📁 FileUploadUtil.java
+
+Usually:
+
+```java
+@Component (if using injection)
+```
+
+OR no annotation if static utility.
+
+---
+
+# 📌 Summary Table (Quick View)
+
+| Layer             | Annotation               |
+| ----------------- | ------------------------ |
+| Main Class        | `@SpringBootApplication` |
+| Config            | `@Configuration`         |
+| Controller        | `@RestController`        |
+| Service Impl      | `@Service`               |
+| Repository        | `@Repository`            |
+| Entity            | `@Entity`                |
+| DTO               | Lombok + Validation      |
+| Exception Handler | `@RestControllerAdvice`  |
+| Aspect            | `@Aspect`, `@Component`  |
+| Health            | `@Component`             |
+| Runner            | `@Component`             |
+
+---

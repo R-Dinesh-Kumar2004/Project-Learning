@@ -1,0 +1,411 @@
+
+# 📘 MVC Architecture (Based on Our EcomApp)
+
+---
+
+# 🔹 1. What is MVC?
+
+**MVC = Model – View – Controller**
+
+It is a design pattern used to:
+
+* Separate logic
+* Separate UI
+* Separate data
+
+This makes applications:
+
+* Cleaner
+* Maintainable
+* Scalable
+
+---
+
+# 🔹 2. MVC Components (Theory First)
+
+| Component  | Responsibility                  |
+| ---------- | ------------------------------- |
+| Model      | Data + Business logic           |
+| View       | UI / Presentation               |
+| Controller | Request handling + Flow control |
+
+---
+
+# 🔹 3. MVC in Our Project (Very Important)
+
+Let’s map MVC to our actual folders.
+
+---
+
+## 🟢 Model (M)
+
+### What is Model in our app?
+
+* `User`
+* `Product`
+* `Shopkeeper`
+* `Category`
+
+Location:
+
+```
+app.ecom.modals
+```
+
+### What does Model do?
+
+* Holds data
+* Has fields + getters/setters
+* No UI code
+* No navigation logic
+
+Example:
+
+```java
+private int id;
+private String name;
+```
+
+🧠 Model never talks to browser directly.
+
+---
+
+## 🔵 View (V)
+
+### What is View in our app?
+
+All JSP files.
+
+Location:
+
+```
+/jsp/admin/
+/jsp/subadmin/
+/jsp/common/
+```
+
+Examples:
+
+* dashboard.jsp
+* products.jsp
+* categories.jsp
+* header.jsp
+* footer.jsp
+
+### What does View do?
+
+* Displays data
+* Uses JSTL
+* Uses EL
+* Contains minimal logic
+
+🧠 JSP does NOT:
+
+* Access ServletContext directly
+* Contain heavy Java code
+* Handle authentication
+
+---
+
+## 🟡 Controller (C)
+
+### What is Controller in our app?
+
+All Servlets.
+
+Location:
+
+```
+app.ecom.servlets
+```
+
+Examples:
+
+* LoginServlet
+* CategoryListServlet
+* AddProductServlet
+* DeleteShopkeeperServlet
+
+### What does Controller do?
+
+* Accepts request
+* Calls Model (reads/writes data)
+* Sets attributes
+* Decides forward or redirect
+
+🧠 Controller never generates full HTML.
+
+---
+
+# 🔹 4. How Request Flows in Our MVC App
+
+Example: Add Category
+
+```
+Browser
+   ↓
+Filter (Auth + Role)
+   ↓
+AddCategoryServlet (Controller)
+   ↓
+Category Model updated
+   ↓
+Redirect to /admin/categories
+   ↓
+CategoryListServlet
+   ↓
+Forward to categories.jsp (View)
+   ↓
+HTML shown
+```
+
+---
+
+# 🔹 5. Why We Blocked Direct JSP Access
+
+We created a **JSP Access Filter**.
+
+Why?
+
+Because in MVC:
+
+> JSP must never be entry point.
+
+Correct flow:
+
+```
+Browser → Servlet → JSP
+```
+
+Wrong flow:
+
+```
+Browser → JSP (bypasses controller)
+```
+
+Blocking `/jsp/*` enforces MVC discipline.
+
+---
+
+# 🔹 6. Role of Filters in MVC
+
+Filters are NOT MVC components.
+
+They are **cross-cutting concerns**.
+
+They handle:
+
+* Authentication
+* Authorization
+* Security
+
+They run before controller.
+
+---
+
+# 🔹 7. Where Session Fits in MVC
+
+Session is not MVC.
+
+It is a container feature.
+
+We use it to:
+
+* Store logged-in user
+* Store role
+* Maintain state across requests
+
+Controller reads session.
+View displays session data.
+
+---
+
+# 🔹 8. Why MVC is Important (Project Context)
+
+Without MVC:
+
+* HTML inside Servlets
+* Logic inside JSP
+* Security scattered everywhere
+
+With MVC:
+
+* Clear structure
+* Easy to debug
+* Easy to extend
+* Clean separation
+
+---
+
+# 🔹 9. Folder Structure Reflects MVC
+
+```
+app.ecom.modals      → Model
+app.ecom.servlets    → Controller
+webapp/jsp           → View
+filters              → Cross-cutting security
+listeners            → Application lifecycle
+```
+
+---
+
+# 🔹 🔟 Real-World Learning From This Project
+
+By building this app, students learned:
+
+* How MVC works in Servlets
+* Why JSP should be view only
+* Why controller decides navigation
+* How business rules are implemented
+* How filters support MVC
+
+---
+
+# 🔹 Final Strong Line (Use in Class)
+
+> "If you understand this project, you understand MVC in Java Web Applications."
+
+---
+
+# 🔹 Why Do We Block Direct JSP Access?
+
+Because in MVC:
+
+> **JSP is a View, not a Controller.**
+
+JSP should only:
+
+* Display data
+* Render UI
+* Show results
+
+It should NOT:
+
+* Decide navigation
+* Handle business logic
+* Perform security checks
+
+---
+
+# 🔹 What Happens If We Allow Direct JSP Access?
+
+Suppose this is allowed:
+
+```
+http://localhost:8080/jsp/admin/dashboard.jsp
+```
+
+Then:
+
+* User can bypass servlet
+* Controller logic is skipped
+* Validation is skipped
+* Security flow may break
+* Request attributes may be missing
+* NullPointerExceptions may occur
+
+---
+
+# 🔹 Correct Flow in MVC
+
+```
+Browser
+   ↓
+Servlet (Controller)
+   ↓
+JSP (View)
+```
+
+Controller:
+
+* Prepares data
+* Checks rules
+* Sets attributes
+* Then forwards
+
+JSP:
+
+* Only displays
+
+---
+
+# 🔹 Why We Created JSP Access Filter
+
+We blocked:
+
+```
+/jsp/*
+```
+
+So that:
+
+* Browser cannot open JSP directly
+* Only servlet can forward to it
+* MVC discipline is enforced
+
+---
+
+# 🔹 Real Example from Our App
+
+Example: `/admin/categories`
+
+Correct flow:
+
+```
+Browser → CategoryListServlet → categories.jsp
+```
+
+Wrong flow:
+
+```
+Browser → categories.jsp
+```
+
+If user directly opens JSP:
+
+* `categories` attribute may not exist
+* Page breaks
+* Or security check bypassed
+
+---
+
+# 🔹 Security Reason
+
+If JSP contains:
+
+```jsp
+${sessionScope.username}
+```
+
+And user directly accesses JSP:
+
+* No proper authentication flow
+* Possible unintended exposure
+
+---
+
+# 🔹 Architectural Rule
+
+> Browser should talk only to Controllers.
+
+Never directly to View.
+
+---
+
+# 🔹 Big Picture
+
+Blocking direct JSP access ensures:
+
+* Clean MVC
+* Better security
+* No broken pages
+* Predictable flow
+* Professional architecture
+
+---
+
+# 🔹 Strong Line
+
+> “If JSP becomes an entry point, MVC is broken.”
+
+---

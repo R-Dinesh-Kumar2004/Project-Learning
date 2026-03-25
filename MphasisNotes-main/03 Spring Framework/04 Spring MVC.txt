@@ -1,0 +1,361 @@
+
+# 1. Introduction to MVC
+
+MVC = **Model View Controller**
+
+It is an architectural pattern that separates:
+
+| Component  | Responsibility                     |
+| ---------- | ---------------------------------- |
+| Model      | Business data + logic              |
+| View       | UI (JSP / HTML)                    |
+| Controller | Handles request & coordinates flow |
+
+---
+
+## 🧠 Why MVC?
+
+Before MVC:
+
+* JSP had Java code
+* Business logic mixed with UI
+* Hard to maintain
+
+MVC solves:
+✔ Separation of concerns
+✔ Clean architecture
+✔ Better maintainability
+✔ Testability
+
+---
+
+# 2. Understanding MVC1 and MVC2 Architectures
+
+---
+
+## 🔹 MVC1 (JSP-Centric)
+
+Flow:
+
+```
+Client → JSP → JavaBeans → JSP → Client
+```
+
+Problems:
+❌ JSP handles request
+❌ Business logic in JSP
+❌ Hard to scale
+❌ Not maintainable
+
+---
+
+## 🔹 MVC2 (Servlet-Based)
+
+Flow:
+
+```
+Client → Servlet (Controller)
+           ↓
+         Model
+           ↓
+         JSP (View)
+```
+
+Advantages:
+✔ Clean separation
+✔ Controller handles flow
+✔ JSP only for view
+
+👉 Spring MVC is based on MVC2.
+
+---
+
+# 3. Front Controller Design Pattern
+
+Front Controller = One central controller that handles all requests.
+
+In Spring MVC:
+👉 **DispatcherServlet** is the Front Controller.
+
+Responsibilities:
+
+* Receives all requests
+* Maps to controller
+* Calls handler
+* Resolves view
+* Returns response
+
+Benefit:
+✔ Centralized request handling
+✔ Logging, security, validation centralized
+
+---
+
+# 4. Spring MVC Basics
+
+Spring MVC components:
+
+| Component         | Role                        |
+| ----------------- | --------------------------- |
+| DispatcherServlet | Front Controller            |
+| HandlerMapping    | Maps URL → Controller       |
+| HandlerAdapter    | Forwards request to handler |
+| Controller        | Handles request             |
+| Model             | Data                        |
+| ViewResolver      | Resolves view name          |
+| View              | JSP / HTML                  |
+
+---
+
+## 🔁 Complete Flow
+
+```
+Client
+   ↓
+DispatcherServlet
+   ↓
+HandlerMapping
+   ↓
+HandlerAdapter
+   ↓
+Controller
+   ↓
+ Model
+   ↓
+ViewResolver
+   ↓
+  JSP
+   ↓
+Client
+```
+
+This flow is VERY important for interviews.
+
+---
+
+# 5. Configuration and DispatcherServlet
+
+In web.xml:
+
+```xml
+<servlet>
+    <servlet-name>spring</servlet-name>
+    <servlet-class>
+        org.springframework.web.servlet.DispatcherServlet
+    </servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>spring</servlet-name>
+    <url-pattern>/</url-pattern>
+</servlet-mapping>
+```
+
+This means:
+All requests go to DispatcherServlet.
+
+Spring loads:
+
+```
+spring-servlet.xml
+```
+
+---
+
+# 6. @Controller and @RequestMapping
+
+---
+
+## 🔹 @Controller
+
+Marks class as Spring MVC Controller.
+
+```java
+@Controller
+public class HomeController {
+}
+```
+
+---
+
+## 🔹 @RequestMapping
+
+Maps URL to method.
+
+```java
+@RequestMapping("/home")
+public String home() {
+    return "home";
+}
+```
+
+Return value = view name.
+
+---
+
+## Method-Level Mapping
+
+```java
+@RequestMapping(value="/save", method=RequestMethod.POST)
+```
+
+Or modern:
+
+```java
+@PostMapping("/save")
+```
+
+---
+
+# 7. @RequestParam and Parameter Binding
+
+Used to fetch request parameters.
+
+Example:
+
+URL:
+
+```
+/add?num1=10&num2=20
+```
+
+Controller:
+
+```java
+@RequestMapping("/add")
+public String add(
+        @RequestParam("num1") int n1,
+        @RequestParam("num2") int n2,
+        Model model) {
+
+    model.addAttribute("result", n1 + n2);
+    return "result";
+}
+```
+
+Spring automatically converts:
+String → int
+
+This is called **Data Binding**.
+
+---
+
+# 8. View Resolvers
+
+Controller returns logical name:
+
+```java
+return "home";
+```
+
+ViewResolver converts it to actual JSP.
+
+Example config:
+
+```xml
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="prefix" value="/WEB-INF/views/"/>
+    <property name="suffix" value=".jsp"/>
+</bean>
+```
+
+So:
+
+```
+home → /WEB-INF/views/home.jsp
+```
+
+---
+
+# 9. Controller Details – @RequestParam vs @PathVariable
+
+---
+
+## 🔹 @RequestParam
+
+URL:
+
+```
+/user?id=10
+```
+
+```java
+@GetMapping("/user")
+public String getUser(@RequestParam int id)
+```
+
+---
+
+## 🔹 @PathVariable
+
+URL:
+
+```
+/user/10
+```
+
+```java
+@GetMapping("/user/{id}")
+public String getUser(@PathVariable int id)
+```
+
+Difference:
+
+| @RequestParam      | @PathVariable                    |
+| ------------------ | -------------------------------- |
+| Query parameter    | URL path                         |
+| Optional           | Usually required                 |
+| Used for filtering | Used for resource identification |
+
+---
+
+# 🔟 Model Data and @ModelAttribute
+
+Model is used to pass data from controller → view.
+
+---
+
+## 🔹 Using Model
+
+```java
+public String show(Model model) {
+    model.addAttribute("name", "Spring");
+    return "home";
+}
+```
+
+In JSP:
+
+```jsp
+${name}
+```
+
+---
+
+## 🔹 @ModelAttribute (Form Binding)
+
+If form submits:
+
+```html
+<input name="name"/>
+<input name="age"/>
+```
+
+Controller:
+
+```java
+@PostMapping("/save")
+public String save(@ModelAttribute Student student) {
+    return "success";
+}
+```
+
+Spring:
+
+* Creates Student object
+* Sets properties automatically
+* Injects into method
+
+🔥 Very powerful for form handling.
+
+---

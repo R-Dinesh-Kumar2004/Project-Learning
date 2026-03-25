@@ -1,0 +1,361 @@
+
+# JSP + Servlet Integration
+
+---
+
+## 1. Core Architecture Idea
+
+> Servlet handles logic
+> JSP handles presentation
+
+This is MVC:
+
+* Servlet = Controller
+* JSP = View
+
+Goal:
+👉 clean separation of logic and UI
+
+---
+
+## 2. Calling JSP from Servlet
+
+There are **three ways** to reach a JSP:
+
+1. `forward()` → server-side transfer
+2. `include()` → server-side append
+3. `sendRedirect()` → client-side navigation
+
+Each behaves differently.
+
+---
+
+## 3. RequestDispatcher.forward()
+
+### Example
+
+```java
+RequestDispatcher rd =
+    request.getRequestDispatcher("result.jsp");
+rd.forward(request, response);
+```
+
+### Behavior
+
+```
+Browser → Servlet → JSP → Response
+```
+
+* same request object
+* same response object
+* URL does NOT change
+* data preserved
+
+---
+
+### Use Case
+
+✔ MVC data transfer
+✔ pass objects to JSP
+✔ internal navigation
+✔ controller → view
+
+---
+
+### Pros
+
+✅ Fast (one request)
+✅ Data preserved
+✅ Clean MVC
+✅ Secure (URL hidden)
+
+---
+
+### Cons
+
+❌ Cannot change URL
+❌ Not suitable for user navigation flow
+
+---
+
+## 4. RequestDispatcher.include()
+
+### Example
+
+```java
+rd.include(request, response);
+```
+
+### Behavior
+
+* JSP output appended
+* servlet continues execution
+* reusable UI blocks
+
+---
+
+### Use Case
+
+✔ header/footer
+✔ menus
+✔ reusable components
+
+---
+
+### Pros
+
+✅ Reusable UI
+✅ no extra request
+✅ efficient
+
+---
+
+### Cons
+
+❌ Not full navigation
+❌ output merging complexity
+
+---
+
+### Memory Rule
+
+> forward = replace
+> include = append
+
+---
+
+## 5. response.sendRedirect()
+
+### Example
+
+```java
+response.sendRedirect("result.jsp");
+```
+
+### Behavior
+
+```
+Browser → Servlet → Redirect → Browser → JSP
+```
+
+* new request created
+* URL changes
+* request object lost
+
+---
+
+## Can we send data with redirect?
+
+👉 Yes — using URL rewriting
+
+```java
+response.sendRedirect(
+  "result.jsp?name=Amit&age=25"
+);
+```
+
+JSP:
+
+```jsp
+request.getParameter("name");
+```
+
+---
+
+### Important clarification
+
+> Redirect loses request object
+> but URL parameters survive
+
+Because browser resends them.
+
+---
+
+### Use Case
+
+✔ login success page
+✔ logout
+✔ navigation
+✔ refresh-safe flow
+
+---
+
+### Pros
+
+✅ URL visible/bookmarkable
+✅ safe navigation
+✅ avoids form resubmission
+
+---
+
+### Cons
+
+❌ extra request (slower)
+❌ limited data size
+❌ not secure for sensitive data
+
+---
+
+## 6. forward vs include vs redirect
+
+| Feature        | forward | include | redirect        |
+| -------------- | ------- | ------- | --------------- |
+| Side           | Server  | Server  | Client          |
+| Requests       | One     | One     | Two             |
+| Data preserved | Yes     | Yes     | No (unless URL) |
+| URL changes    | No      | No      | Yes             |
+| Speed          | Fast    | Fast    | Slower          |
+| MVC use        | Yes     | Partial | No              |
+| Navigation use | No      | No      | Yes             |
+
+---
+
+## Decision Rule (tell students)
+
+> forward → for data
+> include → for UI reuse
+> redirect → for navigation
+
+This rule prevents 90% mistakes.
+
+---
+
+## 7. Forwarding Java Objects to JSP
+
+Servlet:
+
+```java
+User u = new User("Amit", 25);
+request.setAttribute("user", u);
+rd.forward(request, response);
+```
+
+JSP:
+
+```jsp
+User u = (User) request.getAttribute("user");
+```
+
+Object survives because request survives.
+
+---
+
+## 8. Data Scopes in Web Apps
+
+Web apps store data in **three scopes**.
+
+---
+
+### Request Scope
+
+```java
+request.setAttribute("msg", "Hello");
+```
+
+Lifetime:
+👉 one request
+
+Use case:
+✔ servlet → JSP data
+
+---
+
+### Session Scope
+
+```java
+session.setAttribute("user", user);
+```
+
+Lifetime:
+👉 user session
+
+Use case:
+✔ login state
+✔ cart
+✔ preferences
+
+---
+
+### Application Scope
+
+```java
+application.setAttribute("count", 10);
+```
+
+Lifetime:
+👉 entire application
+
+Use case:
+✔ global counters
+✔ configuration
+
+---
+
+## Scope Comparison
+
+| Scope       | Lifetime      | Visibility  | Use Case    |
+| ----------- | ------------- | ----------- | ----------- |
+| Request     | 1 request     | single flow | MVC data    |
+| Session     | user lifetime | per user    | login/cart  |
+| Application | app lifetime  | all users   | global data |
+
+---
+
+## Memory Rule
+
+> Request = temporary
+> Session = per user
+> Application = global
+
+---
+
+## 9. Security Warning (important)
+
+Tell students:
+
+❌ Never put passwords in URL
+❌ Never send large objects via redirect
+❌ URL rewriting is visible
+❌ session is safer than URL
+
+---
+
+## 🔟 MVC Flow Summary
+
+```
+Browser
+  ↓
+Servlet (logic)
+  ↓
+request.setAttribute()
+  ↓
+JSP (view)
+  ↓
+Response
+```
+
+This is classic MVC architecture.
+
+---
+
+## Key Takeaways
+
+* Servlet = logic
+* JSP = UI
+* forward = data transfer
+* include = UI reuse
+* redirect = navigation
+* scopes control lifetime
+* request scope = MVC bridge
+
+---
+
+## One-Line Summary
+
+> Forward for data.
+> Include for reuse.
+> Redirect for navigation.
+
+That’s the entire chapter in one sentence.
+
+---

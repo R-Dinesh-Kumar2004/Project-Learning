@@ -1,0 +1,421 @@
+
+# DAO – Data Access Object
+
+---
+
+## 1. DAO Introduction
+
+### • Introduction
+
+DAO (Data Access Object) is a **design pattern** that separates:
+
+* Business logic
+  from
+* Data access logic
+
+DAO acts as a **bridge** between application and database.
+
+👉 Goal:
+**Hide database interaction details from the service layer.**
+
+---
+
+### Typical Layering
+
+```
+Controller
+   ↓
+Service
+   ↓
+  DAO
+   ↓
+Database
+```
+
+Service does NOT know:
+
+* SQL
+* JDBC
+* ResultSet
+* Connection handling
+
+---
+
+## 2. Plain JDBC Limitations
+
+When we use plain JDBC, we face:
+
+### ❌ Problems
+
+1. Too much boilerplate code
+
+   * Connection
+   * PreparedStatement
+   * ResultSet
+   * Close resources
+
+2. Error-prone resource management
+
+   * Memory leaks
+   * Connections not closed
+
+3. Tight coupling
+
+   * SQL + Java logic mixed
+
+4. No centralized exception handling
+
+   * Checked SQLExceptions everywhere
+
+5. Hard to test
+
+   * Direct DB dependency
+
+6. Code repetition
+
+   * Same logic repeated in every DAO
+
+---
+
+## 3. Spring JDBC / DAO Advantages
+
+Spring JDBC solves these problems.
+
+### ✅ Advantages
+
+1. Eliminates boilerplate code
+2. Automatic resource management
+3. Converts checked exceptions → runtime exceptions
+4. Cleaner DAO code
+5. Better separation of concerns
+6. Easy integration with Spring IoC
+
+👉 Spring does NOT replace JDBC — it **wraps** it.
+
+---
+
+# 📊 JDBC vs Spring JDBC – Comparison Table
+
+| Feature              | JDBC                 | Spring JDBC                   |
+| -------------------- | ----------------------------------- | -------------- |
+| API Type             | Core Java API        | Abstraction over JDBC         |
+| Boilerplate Code     | Very high            | Very low                      |
+| Connection Handling  | Manual               | Automatic                     |
+| Resource Closing     | Must close manually  | Automatically handled         |
+| Exception Handling   | Checked SQLException | Unchecked DataAccessException |
+| Code Readability     | Verbose              | Clean and concise             |
+| SQL Writing          | Required             | Required                      |
+| Template Support     | No                   | JdbcTemplate                  |
+| Dependency Injection | Not supported        | Fully supports DI             |
+| Integration with IoC | No                   | Yes                           |
+| Learning Curve       | Basic Java knowledge | Requires Spring understanding |
+
+
+---
+
+## 4. Working with Different Data Sources
+
+A **DataSource** represents database connection details.
+
+Spring supports:
+
+* DriverManagerDataSource
+* Connection pooling DataSources
+* JNDI DataSource
+
+### Example (XML):
+
+```xml
+<bean id="dataSource"
+      class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/library"/>
+    <property name="username" value="root"/>
+    <property name="password" value="root"/>
+</bean>
+```
+
+Spring uses DataSource instead of directly using DriverManager.
+
+---
+
+## 5. Dependency Injection: JdbcTemplate + BookDaoImpl
+
+### Step 1: JdbcTemplate Bean
+
+```xml
+<bean id="jdbcTemplate"
+      class="org.springframework.jdbc.core.JdbcTemplate">
+    <property name="dataSource" ref="dataSource"/>
+</bean>
+```
+
+JdbcTemplate depends on DataSource → injected via DI.
+
+---
+
+### Step 2: DAO Interface
+
+```java
+public interface BookDao {
+    void addBook(Book book);
+    Book getBookById(int id);
+}
+```
+
+---
+
+### Step 3: DAO Implementation
+
+```java
+public class BookDaoImpl implements BookDao {
+
+    private JdbcTemplate jdbcTemplate;
+
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public void addBook(Book book) {
+        String sql = "insert into book values (?, ?)";
+        jdbcTemplate.update(sql, book.getId(), book.getName());
+    }
+}
+```
+
+---
+
+### Step 4: Inject JdbcTemplate into DAO
+
+```xml
+<bean id="bookDao" class="com.demo.BookDaoImpl">
+    <property name="jdbcTemplate" ref="jdbcTemplate"/>
+</bean>
+```
+
+This is **pure IoC + DI + DAO pattern**.
+
+Refer Image: 05_spring_jdbc_di.png
+
+---
+
+## 6. JdbcTemplate
+
+JdbcTemplate is the **core Spring JDBC helper class**.
+
+It handles:
+
+* Connection opening/closing
+* Statement creation
+* Exception handling
+* ResultSet iteration
+
+---
+
+### JdbcTemplate Methods (Very Important)
+
+---
+
+### 🔹 Get ONE Object
+
+```java
+queryForObject(String sql, RowMapper<T>, args...)
+```
+
+Example:
+
+```java
+Book book = jdbcTemplate.queryForObject(
+    "select * from book where id=?",
+    new BookRowMapper(),
+    id
+);
+```
+
+---
+
+### 🔹 Get ALL Objects
+
+```java
+query(String sql, RowMapper<T>)
+```
+
+Example:
+
+```java
+List<Book> books = jdbcTemplate.query(
+    "select * from book",
+    new BookRowMapper()
+);
+```
+
+---
+
+### 🔹 Insert / Update / Delete
+
+```java
+update(String sql, args...)
+```
+
+Examples:
+
+```java
+jdbcTemplate.update("insert into book values (?,?)", 1, "Java");
+jdbcTemplate.update("update book set name=? where id=?", "Spring", 1);
+jdbcTemplate.update("delete from book where id=?", 1);
+```
+
+---
+
+### 🔹 Create Schema / Table
+
+```java
+execute(String sql)
+```
+
+Example:
+
+```java
+jdbcTemplate.execute(
+    "create table book (id int primary key, name varchar(50))"
+);
+```
+
+---
+
+## 7. NamedParameterJdbcTemplate
+
+Problem with JdbcTemplate:
+
+```java
+insert into book values (?, ?, ?)
+```
+
+Order matters → error-prone.
+
+### Solution: Named Parameters
+
+```java
+insert into book values (:id, :name)
+```
+
+---
+
+### Example
+
+```java
+String sql = "insert into book values (:id, :name)";
+
+MapSqlParameterSource params = new MapSqlParameterSource();
+params.addValue("id", 1);
+params.addValue("name", "Spring");
+
+namedParameterJdbcTemplate.update(sql, params);
+```
+
+---
+
+### Advantages
+
+✔ Readable SQL
+✔ Order-independent
+✔ Better maintainability
+
+---
+
+## 8. Spring JDBC / DAO with Annotations
+
+Even though we are mostly XML-based, annotations are commonly mixed.
+
+---
+
+### @Repository
+
+```java
+@Repository
+public class BookDaoImpl implements BookDao {
+}
+```
+
+Purpose:
+
+* Marks DAO layer
+* Enables exception translation
+
+---
+
+### @Autowired (for JdbcTemplate)
+
+```java
+@Autowired
+private JdbcTemplate jdbcTemplate;
+```
+
+---
+
+### XML Enablement
+
+```xml
+<context:component-scan base-package="com.demo"/>
+```
+
+---
+
+### Why @Repository is Important?
+
+Spring converts:
+
+```java
+SQLException
+```
+
+into:
+
+```java
+DataAccessException (unchecked)
+```
+
+This happens only for DAO beans.
+
+---
+
+## 9. Key Interview & Teaching Points
+
+1. DAO hides database logic.
+2. Spring JDBC reduces boilerplate, not SQL.
+3. JdbcTemplate is thread-safe.
+4. DataSource is injected, not created manually.
+5. NamedParameterJdbcTemplate improves readability.
+6. @Repository enables exception translation.
+
+---
+
+Class Project Queries:
+
+CREATE SCHEMA spring_jdbc_demo
+
+CREATE TABLE `spring_jdbc_demo`.`books` (
+  `book_id` INT NOT NULL AUTO_INCREMENT,
+  `book_name` VARCHAR(45) NOT NULL,
+  `book_price` DECIMAL(6,2) NULL,
+  `no_of_copies` INT NULL,
+  `in_stock` BIT(1) NULL,
+  `date_of_publication` DATE NULL,
+  PRIMARY KEY (`book_id`),
+  UNIQUE INDEX `book_id_UNIQUE` (`book_id` ASC) VISIBLE,
+  UNIQUE INDEX `book_name_UNIQUE` (`book_name` ASC) VISIBLE)
+
+
+INSERT INTO `spring_jdbc_demo`.`books` 
+  (`book_name`, `book_price`, `no_of_copies`, `in_stock`, `date_of_publication`) 
+  VALUES (?, ?, ?, ?, ?)
+
+UPDATE `spring_jdbc_demo`.`books` SET no_of_copies = ? , in_stock = ? where book_id = ?
+
+DELETE FROM `spring_jdbc_demo`.`books` WHERE book_id = ?
+
+SELECT * FROM `spring_jdbc_demo`.`books` WHERE book_id = ?
+
+SELECT * FROM `spring_jdbc_demo`.`books`
+
+---

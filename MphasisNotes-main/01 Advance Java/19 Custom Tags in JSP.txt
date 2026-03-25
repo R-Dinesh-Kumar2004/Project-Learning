@@ -1,0 +1,275 @@
+
+# Developing Custom Tags in JSP
+
+---
+
+## 1. What are Custom Tags?
+
+### Definition
+
+> Custom tags are user-defined JSP tags that allow us to create reusable components.
+
+They look like:
+
+```jsp
+<my:header />
+```
+
+instead of repeating HTML everywhere.
+
+---
+
+## Why custom tags exist (Use Case)
+
+Without custom tags:
+
+```jsp
+<h1>Company Header</h1>
+<hr>
+```
+
+repeated in 20 pages ❌
+
+With custom tags:
+
+```jsp
+<my:header />
+```
+
+👉 reusable
+👉 maintainable
+👉 clean JSP
+👉 no duplication
+
+---
+
+## 2. JSP 2 Tag Files (Simple Custom Tags)
+
+JSP 2 introduced **tag files**, which are:
+
+> JSP files that behave like reusable tags.
+
+No Java class needed.
+
+---
+
+## 3. Creating a Custom Tag (Step-by-Step)
+
+### Step 1 — Create folder
+
+Inside:
+
+```
+WEB-INF/tags/
+```
+
+This folder is required.
+
+---
+
+### Step 2 — Create a tag file
+
+Example:
+
+```
+header.tag
+```
+
+Location:
+
+```
+WEB-INF/tags/header.tag
+```
+
+---
+
+### Step 3 — Write tag content
+
+```jsp
+<h1>Welcome to My Website</h1>
+<hr>
+```
+
+This is normal JSP/HTML.
+
+---
+
+### Step 4 — Use tag in JSP
+
+At top of JSP:
+
+```jsp
+<%@ taglib prefix="my" tagdir="/WEB-INF/tags" %>
+```
+
+Then use:
+
+```jsp
+<my:header />
+```
+
+---
+
+## What happens internally
+
+JSP container:
+
+* converts tag file into helper class
+* executes it
+* inserts output
+
+👉 behaves like built-in tag
+
+---
+
+## 4. Customizing Tag Behavior with Attributes
+
+Custom tags become powerful when they accept **parameters**.
+
+---
+
+## Example: Dynamic Header Tag
+
+### header.tag
+
+```jsp
+<%@ attribute name="title" required="true" %>
+
+<h1><%= title %></h1>
+<hr>
+```
+
+---
+
+### JSP usage
+
+```jsp
+<my:header title="Dashboard" />
+```
+
+Output:
+
+```
+Dashboard
+```
+
+---
+
+## Attribute Directive Explained
+
+```jsp
+<%@ attribute name="title" required="true" %>
+```
+
+| Part     | Meaning               |
+| -------- | --------------------- |
+| name     | attribute name        |
+| required | must user provide it? |
+| type     | data type (optional)  |
+
+---
+
+## Optional attribute example
+
+```jsp
+<%@ attribute name="color"
+              required="false"
+              type="java.lang.String" %>
+```
+
+---
+
+## Tag with logic example
+
+```jsp
+<%@ attribute name="user" required="true" %>
+
+<% if (user != null) { %>
+    Hello, <%= user %>
+<% } else { %>
+    Guest
+<% } %>
+```
+
+Usage:
+
+```jsp
+<my:greet user="Amit" />
+```
+
+---
+
+## 5. Why Custom Tags Matter
+
+Custom tags allow:
+
+✔ UI reuse
+✔ clean JSP
+✔ separation of logic
+✔ team collaboration
+✔ component architecture
+✔ large project maintainability
+
+They are JSP’s version of:
+
+👉 React components
+👉 Angular components
+
+This analogy helps students.
+
+---
+
+## 6. Pros & Cons
+
+### Pros
+
+✅ reusable
+✅ readable JSP
+✅ no duplication
+✅ easier maintenance
+✅ no Java class needed (tag files)
+
+---
+
+### Cons
+
+❌ extra abstraction for small apps
+❌ debugging slightly harder
+
+But worth it in real projects.
+
+---
+
+## 7. Tag File Rules (Important)
+
+* must be inside `WEB-INF/tags`
+* cannot be accessed directly by browser
+* only usable via JSP
+* behaves like server-side component
+
+---
+
+## 8. Memory Rules
+
+> Tag file = reusable JSP component
+> Attribute = parameter
+> prefix:name = custom tag
+
+---
+
+## 9. Real-world examples of custom tags
+
+* header/footer
+* navigation bar
+* user card
+* table generator
+* validation message
+* layout templates
+
+---
+
+## 🔟 One-line Summary
+
+> Custom tags turn repeated JSP code into reusable components.
+
+---

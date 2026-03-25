@@ -1,0 +1,316 @@
+
+# Java EE Architecture
+
+---
+
+## 1. What is Java EE Architecture?
+
+### Simple Meaning
+
+> **Java EE architecture explains how different parts of a web application work together.**
+
+It shows:
+
+* who sends the request
+* who processes it
+* who stores data
+* who sends the response back
+
+👉 Architecture = **big picture of the system**
+
+---
+
+## 2. Client–Server Architecture
+
+### Basic Idea
+
+> A web application works on **client–server architecture**.
+
+There are **two main sides**:
+
+* Client (Frontend)
+* Server (Backend)
+
+They communicate over a **network**.
+
+---
+
+## 3. What is a Client?
+
+### Definition
+
+> **Client is the system that sends a request.**
+
+Usually:
+
+* a browser
+* a mobile app
+* a desktop app
+
+---
+
+### 3.1 Frontend (Client Side)
+
+#### a) Client Machine
+
+* Laptop
+* Desktop
+* Mobile phone
+
+#### b) Client Software
+
+* Chrome
+* Edge
+* Firefox
+* Mobile browser / app
+
+---
+
+#### c) Frontend Languages
+
+Used to:
+
+* design UI
+* collect user input
+* send request to server
+
+Examples:
+
+* HTML
+* CSS
+* JavaScript
+
+👉 Frontend **cannot directly access database**
+
+---
+
+## 4. What is a Server?
+
+### Definition
+
+> **Server is the system that receives requests and sends responses.**
+
+---
+
+### 4.1 Backend (Server Side)
+
+#### a) Server Machine
+
+* A powerful computer
+* Runs 24×7
+* Usually located in data centers
+
+---
+
+#### b) Server Software
+
+Software that:
+
+* listens for requests
+* executes backend code
+* sends response
+
+Examples:
+
+* Web servers
+* Application servers
+
+---
+
+### 4.2 Server-Side Code (Backend Code)
+
+> Code that runs **on the server**, not in browser.
+
+Examples:
+
+* Servlets
+* Spring controllers
+* Business logic
+
+---
+
+### 4.3 Backend Languages
+
+Used to write server-side code.
+
+Examples:
+
+* Java
+* C#
+* Python
+* Node.js
+
+👉 In this training, **we use Java**
+
+---
+
+## 5. Database Server
+
+### What is a Database Server?
+
+> A server that stores application data permanently.
+
+---
+
+### Database Technologies
+
+Examples:
+
+* MySQL
+* Oracle
+* PostgreSQL
+
+---
+
+### Role of Database
+
+* Store user data
+* Store transactions
+* Store application records
+
+👉 Backend talks to database
+👉 Frontend **never talks directly** to database
+
+---
+
+## 6. Different Types of Servers (High Level)
+
+### 6.1 Web Server
+
+* Handles HTTP requests
+* Serves static content
+
+Example:
+
+* Apache Tomcat
+
+---
+
+### 6.2 Application Server
+
+* Handles complete Java EE stack
+* Supports transactions, security, etc.
+* Can run servlets
+
+Examples:
+
+* Apache Tomcat
+* WildFly
+* GlassFish
+
+👉 For learning Servlets, **Tomcat is enough**
+
+---
+
+### 6.3 Database Server
+
+* Stores data
+* Runs database software
+
+Example:
+
+* MySQL Server
+
+---
+
+## 7. Java Client (Special Case)
+
+### What is Java Client?
+
+> A Java program that acts as a client.
+
+Examples:
+
+* Java desktop application
+* Java program sending HTTP request
+
+👉 Client **does not have to be browser only**
+
+---
+
+## 8. Network Basics
+
+### What is a Network?
+
+> A network connects client and server so they can communicate.
+
+Internet is the biggest network.
+
+---
+
+## 9. HTTP (HyperText Transfer Protocol)
+
+### What is HTTP?
+
+> **HTTP is a protocol used for communication between client and server.**
+
+---
+
+### Basic Flow
+
+1. Client sends HTTP request
+2. Server processes request
+3. Server sends HTTP response
+
+---
+
+### Examples of HTTP Requests
+
+* Request for a web page
+* Form submission
+* API call
+
+👉 Servlets work on **HTTP**
+
+---
+
+## 🔟 Deployment
+
+### What is Deployment?
+
+> **Copying our application to a server so users can access it.**
+
+Example:
+
+* Deploying a WAR file on Tomcat
+
+👉 Until deployment, app works **only on our machine**
+
+---
+
+## 11. Hosting
+
+### What is Hosting?
+
+> **Providing a server and network so our application is accessible on the internet.**
+
+Hosting includes:
+
+* server machine
+* server software
+* internet access
+
+👉 Hosting makes application **publicly available**
+
+---
+
+## 12. One-Page Mental Picture (Tell Them This)
+
+> Browser (Client)
+> → HTTP Request
+> → Server (Servlet / Java code)
+> → Database
+> → HTTP Response
+> → Browser
+
+---
+
+## Key Takeaways for Students
+
+* Client sends request
+* Server processes request
+* Database stores data
+* HTTP connects everything
+* Java EE defines how backend works
+
+---

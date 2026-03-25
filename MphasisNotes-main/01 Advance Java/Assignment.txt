@@ -1,0 +1,79 @@
+
+# 🧪 LAB ASSIGNMENT – 1
+
+## Employee Attendance & Salary Report
+
+### Objective
+
+To transfer data from **HTML → Servlet → JSP** using **request scope** and display processed results using **JSP scripting elements**.
+
+---
+
+### Input (HTML Form)
+
+Create an HTML file that collects the following details:
+
+1. Employee ID (number)
+2. Employee Name (text)
+3. Department (text)
+4. Date of Joining (date)
+5. Monthly Salary (number)
+6. Total Working Days (number)
+7. Days Present (number)
+
+---
+
+### Processing (Servlet)
+
+The Servlet must perform the following tasks:
+
+1. Read all form data
+2. Convert **Date of Joining** into `LocalDate`
+3. Calculate:
+
+   * Attendance Percentage
+
+     ```
+     (daysPresent * 100.0) / totalWorkingDays
+     ```
+   * Salary Payable
+
+     ```
+     (monthlySalary * daysPresent) / totalWorkingDays
+     ```
+4. Decide Attendance Grade:
+
+   * Grade A → Attendance ≥ 90%
+   * Grade B → Attendance 75% – 89%
+   * Grade C → Attendance < 75%
+5. Store **all input data and calculated values** in **request scope**
+6. Forward the request to a JSP
+
+---
+
+### Output (JSP)
+
+Using **ONLY**:
+
+* Scriptlet tags `<% %>`
+* Expression tags `<%= %>`
+* Declaration tags `<%! %>`
+
+Display:
+
+* Employee details
+* Attendance percentage
+* Salary payable
+* Attendance grade
+
+---
+
+### Constraints
+
+* Request scope only
+* No JSTL
+* No EL
+* No session or application scope
+* No database
+
+---

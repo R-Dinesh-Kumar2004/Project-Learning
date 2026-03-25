@@ -1,0 +1,336 @@
+SLF4J logging
+=============
+📌 SLF4J Logging in Spring Applications
+
+1. What is SLF4J?
+
+=> SLF4J = *Simple Logging Facade for Java*
+=> It’s not a logging implementation — it’s an abstraction layer.
+=> Lets you plug in different logging frameworks at runtime (Logback, Log4j2, java.util.logging, etc.).
+=> Spring Boot uses Logback as the default logging framework.
+
+---
+
+2. Why use SLF4J in Spring?
+
+=> Keeps code independent of any specific logging framework.
+=> Makes switching logging implementations simple.
+=> Cleaner API than java.util.logging.
+=> Integrates naturally with Spring Boot’s logging system.
+
+---
+
+3. Maven Setup
+
+If using Spring Boot — no need to add SLF4J manually (comes via `spring-boot-starter`).
+
+If using without Spring Boot:
+
+```xml
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>2.0.9</version>
+</dependency>
+
+<dependency> <!-- Example backend -->
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.4.14</version>
+</dependency>
+```
+
+---
+
+4. Using SLF4J in Spring
+
+Manual Logger
+
+```java
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MyService {
+    private static final Logger log = LoggerFactory.getLogger(MyService.class);
+
+    public void process() {
+        log.info("Processing started...");
+        log.debug("Debug details: {}", "extra info");
+        log.warn("Potential issue detected");
+        log.error("Something went wrong!", new RuntimeException("Error"));
+    }
+}
+```
+
+With Lombok
+
+```java
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
+public class MyService {
+    public void process() {
+        log.info("Processing started...");
+    }
+}
+```
+
+---
+
+5. Logging Levels
+
+| Level   | Purpose                                           |
+| ------- | ------------------------------------------------- |
+| `TRACE` | Most detailed logs (method-level tracing)         |
+| `DEBUG` | Debugging information for developers              |
+| `INFO`  | General application flow messages                 |
+| `WARN`  | Something unexpected, but application still works |
+| `ERROR` | Critical issue, needs attention                   |
+
+---
+
+6. Logging in Spring Boot
+
+=> Default level: `INFO`
+=> Configure in `application.properties`:
+
+```properties
+logging.level.root=INFO
+logging.level.com.example=DEBUG
+logging.file.name=app.log
+```
+
+=> Supports YAML format too.
+
+---
+
+7. Best Practices
+
+=> Always use `{}` placeholders instead of string concatenation:
+
+  ```java
+  log.debug("User {} logged in at {}", username, loginTime);
+  ```
+=> Avoid excessive `INFO` logs for high-traffic methods.
+=> Use `DEBUG` for development, `INFO/WARN` for production.
+=> Do not log sensitive data (passwords, tokens).
+
+---
+
+8. How Spring Internally Uses SLF4J
+
+=> Spring Framework itself logs via SLF4J.
+=> Boot auto-configures Logback but allows you to replace it with Log4j2 or others by changing dependencies.
+=> Integration works with `@Slf4j` (Lombok) or manual `LoggerFactory`.
+
+---
+private static final Logger log = LoggerFactory.getLogger(MyService.class);
+
+## Breaking it down
+
+```java
+private static final Logger log = LoggerFactory.getLogger(MyService.class);
+```
+
+1. private
+
+=> This logger is only accessible inside `MyService` class.
+=> You don’t want outside classes messing with your logger.
+
+2. static
+
+=> Belongs to the class, not any particular object.
+=> One logger instance is shared by all objects of `MyService`.
+=> Avoids unnecessary creation of loggers for each object.
+
+3. final
+
+=> The `log` reference cannot be reassigned after it’s initialized.
+=> Ensures that once the logger is set up, it’s constant for the lifetime of the class.
+
+4. Logger
+
+=> This is the SLF4J logging interface.
+=> You call methods on it like `log.info()`, `log.error()`, etc.
+
+5. LoggerFactory.getLogger(MyService.class)
+
+=> `LoggerFactory` is the SLF4J facade factory that returns a `Logger` instance.
+=> `MyService.class` tells SLF4J:
+
+  => “Create a logger associated with this class”
+  => This makes logs automatically include the class name in log messages (e.g., `[MyService]` in log output).
+
+---
+
+Why this is common practice
+
+=> Logging per class makes it easy to trace where messages come from.
+=> Using SLF4J means you can switch the underlying logging framework (Logback, Log4j, JUL) without changing your code — it’s the facade pattern in action.
+=> Declaring it `private static final` follows best practice:
+
+  => Private → not exposed
+  => Static → shared
+  => Final → constant
+
+---
+
+✅ Example usage:
+
+```java
+public void processData() {
+    log.info("Processing data...");
+    try {
+        // some code
+    } catch (Exception e) {
+        log.error("Error processing data", e);
+    }
+}
+```
+
+---
+
+These log levels in SLF4J (and most logging frameworks) indicate the importance and detail of the message you’re logging.
+Think of them like “urgency levels” for your application’s diary.
+
+---
+
+## 📊 Logging Levels & When to Use Them
+
+Here’s the list version of SLF4J log levels and when to use them:
+
+---
+
+1. TRACE
+
+=> Most detailed level — logs *everything*, including fine-grained execution details.
+=> Used mainly for diagnosing very specific problems.
+=> Typically disabled in production.
+=> Example: Logging every method call, variable change, or loop iteration.
+
+---
+
+2. DEBUG
+
+=> Detailed developer-level information about application flow and state.
+=> Used during development or troubleshooting, not usually enabled in production.
+=> Example: `"Fetched 25 records from database in 50ms"`
+
+---
+
+3. INFO
+
+=> General, high-level information about normal application operations.
+=> Safe to keep in production logs.
+=> Example: `"User Vinay logged in successfully"`
+
+---
+
+4. WARN
+
+=> Indicates an unusual situation that does not stop the application but needs attention.
+=> Example: `"Disk space is running low: 15% remaining"`
+
+---
+
+5. ERROR
+
+=> Indicates a serious problem that prevents a specific task from completing.
+=> The application might still run, but this event needs immediate attention.
+=> Example: `"Database connection failed: timeout after 30s"`
+
+---
+
+Rule of Thumb
+
+=> TRACE → "I want to see *everything*, even internal details."
+=> DEBUG → "I want to see detailed developer-level info."
+=> INFO → "I want to know major checkpoints/events."
+=> WARN → "Something is odd; check it soon."
+=> ERROR → "Something broke; fix it now."
+
+---
+
+Typical Production Setup
+
+=> Enable: INFO, WARN, ERROR
+=> Disable: DEBUG, TRACE (to avoid huge logs & performance overhead)
+=> Temporarily enable DEBUG/TRACE in production only for diagnosing issues.
+
+---
+
+Exercise: 
+=> Put all types of loggers in code.
+=> Run the code
+=> Check all log levels : we will find that trace and debug aren't visible.
+
+=> Create a file in resources folder by the name: simplelogger.properties
+=> Write down:
+
+# Set global log level to TRACE (shows everything)
+logging.level.root=TRACE
+
+# Optional pretty printing
+org.slf4j.simpleLogger.showDateTime=true
+org.slf4j.simpleLogger.dateTimeFormat=yyyy-MM-dd HH:mm:ss
+org.slf4j.simpleLogger.showThreadName=true
+
+** With above setting for `trace logs`, the logs for even Spring Library and other libraries will become visible and it will become overcrowded 
+
+=> Inorder to close logs for libraries and enable them only for our project - write following:
+
+#Enable only info for other libraries
+org.slf4j.simpleLogger.defaultLogLevel=info
+
+# And enable detailed logs for our code
+#org.slf4j.simpleLogger.log.<base-package>=trace
+org.slf4j.simpleLogger.log.spring.core=trace
+
+Switch On/Off levels
+====================
+With slf4j-simple, we can’t completely “filter to only INFO” at runtime, but we can configure it so only one level (and higher levels) appear in the console.
+
+If we only want INFO logs: 
+
+org.slf4j.simpleLogger.defaultLogLevel=info
+
+** It will show: INFO, WARN, ERROR
+** It will not show: DEBUG, TRACE
+
+Levels: Trace, Debug, Info, Warn, Error
+
+⚠ Slf4j-simple doesn’t support “show only INFO” and hide WARN/ERROR — levels are inclusive upward.
+
+----
+Logging setups
+--------------
+# 1) Write logs to a file
+logging.file.name=logs/app.log
+
+# 2) Rolling file pattern → NEW FILE EVERY MINUTE
+logging.logback.rollingpolicy.file-name-pattern=logs/app-%d{yyyy-MM-dd_HH-mm}.%i.log
+
+# 3) Keep only last 20 rotated log files
+logging.logback.rollingpolicy.max-history=20
+
+# 4) Max size per rolled file (helps in active rolling)
+logging.logback.rollingpolicy.max-file-size=1MB
+
+# 5) Overall cap on total log directory size
+logging.logback.rollingpolicy.total-size-cap=200MB
+
+
+Logback’s rolling frequency is based on the lowest time unit in %d{}:
+Timestamp pattern	Rotation happens every
+%d{yyyy}	1 year
+%d{yyyy-MM}	1 month
+%d{yyyy-MM-dd}	1 day
+%d{yyyy-MM-dd_HH}	1 hour
+%d{yyyy-MM-dd_HH-mm}	1 minute
+%d{yyyy-MM-dd_HH-mm-ss}	1 second
+
+You chose yyyy-MM-dd_HH-mm, so Logback rotates every minute.

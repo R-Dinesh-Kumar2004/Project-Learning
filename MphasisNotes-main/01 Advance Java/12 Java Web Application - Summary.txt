@@ -1,0 +1,231 @@
+
+# Java Web Application – Consolidated Summary Notes
+
+---
+
+## 1. Java Editions & Java EE
+
+* Java comes in different editions:
+
+  * Java SE → Core Java
+  * Java EE → Web & enterprise applications
+* Java EE is **not a framework**
+* Java EE is a **set of specifications**
+* Specifications define **rules**, not implementations
+* Java EE is now called **Jakarta EE**
+* Package name changed:
+
+  * `javax.*` → `jakarta.*`
+
+---
+
+## 2. Java EE Architecture (Big Picture)
+
+Java web applications follow **Client–Server Architecture**.
+
+### Client (Frontend)
+
+* Browser / Mobile / App
+* Uses HTML, CSS, JavaScript
+* Sends HTTP requests
+* Cannot access database directly
+
+### Server (Backend)
+
+* Runs Java code (Servlets)
+* Processes requests
+* Communicates with database
+* Sends HTTP responses
+
+### Database Server
+
+* Stores application data
+* Used only by backend
+
+---
+
+## 3. What is HTTP?
+
+* HTTP = communication protocol
+* Works on **request–response model**
+* Client sends request
+* Server sends response
+* HTTP is **stateless**
+
+  * Server does not remember previous requests
+
+---
+
+## 4. HTTP Methods (Basics)
+
+* GET → fetch data
+* POST → send data
+* PUT → update data
+* DELETE → remove data
+* PATCH → partial update
+
+### Important Rules
+
+* Link click → GET
+* Form → GET or POST
+* Redirect → GET
+* Refresh → GET
+
+---
+
+## 5. Dynamic Web Application
+
+* Dynamic app generates response at runtime
+* Needs a server to run
+* Uses servlets to process requests
+
+### Standard Project Structure
+
+* Java files → `src`
+* HTML/CSS/JS → `webapp / WebContent`
+* `WEB-INF` → protected files
+* `web.xml` → configuration file
+
+---
+
+## 6. Deployment & Server Startup (Tomcat)
+
+When application is deployed:
+
+1. Server reads `web.xml`
+2. Reads welcome file
+3. Reads servlet mappings
+4. Creates **ServletContext**
+5. Creates **ServletConfig**
+6. Maintains internal registry
+7. Serves first request
+
+---
+
+## 7. Servlet API (Core Classes)
+
+* Servlet → base interface
+* GenericServlet → protocol-independent
+* HttpServlet → HTTP-based servlet
+* HttpServletRequest → incoming data
+* HttpServletResponse → outgoing data
+* ServletContext → application-level data
+* ServletConfig → servlet-level data
+
+---
+
+## 8. Sending Data from Browser to Server (Request)
+
+### Ways to Send Data
+
+1. Clicking a link (GET)
+2. Submitting a form (GET / POST)
+3. Redirection (GET)
+4. JavaScript (any method)
+5. Browser refresh (GET)
+
+### Key Concepts
+
+* Data travels as **key–value pairs**
+* Data always comes as **String**
+* Use:
+
+  * `getParameter()` → single value
+  * `getParameterValues()` → multiple values
+
+---
+
+## 9. HTTP Request – Components
+
+An HTTP request contains:
+
+* Request line (method + URL)
+* Headers
+* Query parameters
+* Request body (POST, PUT)
+
+---
+
+## 10. Sending Data from Server to Browser (Response)
+
+Servlet sends response using:
+
+* HttpServletResponse
+
+### Response Contains
+
+* Status code (200, 404, 500, etc.)
+* Headers (content type)
+* Body (actual output)
+
+### Ways to Send Response
+
+* PrintWriter → direct output
+* sendRedirect() → new request
+
+---
+
+## 1️1. ServletContext vs ServletConfig
+
+### ServletContext
+
+* One per application
+* Shared by all servlets
+* Application-level data
+
+### ServletConfig
+
+* One per servlet
+* Servlet-specific data
+
+---
+
+## 1️2. Servlet Lifecycle (Most Important)
+
+Servlet lifecycle is **managed by the container**.
+
+### Lifecycle Steps
+
+1. Servlet class loaded
+2. Servlet object created (once)
+3. ServletConfig created
+4. `init()` called (once)
+5. Request received
+6. Request & response objects created
+7. `service()` called
+8. `doGet()` / `doPost()` called
+9. Response sent
+10. `destroy()` called (once)
+
+---
+
+## 1️3. Key Rules to Remember (Exam + Interview)
+
+* We never create servlet objects
+* One servlet object handles many requests
+* Request & response objects are created per request
+* `service()` decides which `doXXX()` method to call
+* ServletContext ≠ ServletConfig
+* HTTP is stateless
+
+---
+
+## 1️4. One-Line Mental Model (Very Powerful)
+
+> **Browser → HTTP Request → Servlet → Java Code → Response → Browser**
+
+---
+
+## Final Takeaway
+
+By now, we understand:
+
+* how a Java web application starts
+* how data flows from browser to server
+* how Tomcat manages servlets
+* how request and response work
+* how lifecycle is controlled
+
+👉 This is the **foundation** of everything that comes next.
+
+---

@@ -1,0 +1,335 @@
+
+# 🏗 Layers in SbEcomApp
+
+---
+
+Our application follows a **Layered Architecture**.
+
+This means responsibilities are divided into structured layers.
+
+Each layer has a clear purpose.
+
+---
+
+# 🎯 1. Layers in Sequence (Request Flow)
+
+When a request comes:
+
+```
+Client
+↓
+Controller  ↔ (Uses DTOs)
+↓
+Service     ↔ (Converts DTO ↔ Entity)
+↓
+Repository  ↔ (Uses Entities)
+↓
+Database
+```
+
+And response flows back up.
+
+Additionally:
+
+* AOP intercepts Service layer
+* Exception Handler catches errors globally
+* DTOs shape request & response
+* Config manages beans
+* Runner runs at startup
+* Actuator monitors app health
+
+---
+
+# 📦 2. Layer-by-Layer Explanation
+
+---
+
+# 1. Controller Layer
+
+### 📍 Role:
+
+Handles HTTP requests.
+
+### 📌 Responsibilities:
+
+* Define API endpoints
+* Accept request body / path variables
+* Return response
+* Use `ApiResponseDTO`
+
+### ❌ Should NOT:
+
+* Contain business logic
+* Contain database logic
+
+### 🎯 Significance:
+
+Separates web logic from business logic.
+
+Example:
+
+```java
+@GetMapping("/categories")
+```
+
+---
+
+# 2. Service Layer
+
+### 📍 Role:
+
+Contains business logic.
+
+### 📌 Responsibilities:
+
+* Process data
+* Apply business rules
+* Validate logic
+* Throw custom exceptions
+* Manage transactions
+
+### 🎯 Significance:
+
+Keeps controllers thin.
+Central place for application logic.
+
+Example:
+
+```java
+@Transactional
+public Order placeOrder(...)
+```
+
+---
+
+# 3. Repository Layer
+
+### 📍 Role:
+
+Handles database communication.
+
+### 📌 Responsibilities:
+
+* CRUD operations
+* Derived queries
+* Custom queries
+
+### 🎯 Significance:
+
+Abstracts database access.
+We never write JDBC manually.
+
+Example:
+
+```java
+extends JpaRepository<Category, Integer>
+```
+
+---
+
+# 4. Entity Layer
+
+### 📍 Role:
+
+Represents database tables.
+
+### 📌 Responsibilities:
+
+* Map objects to tables
+* Define relationships
+* Define primary keys
+
+### 🎯 Significance:
+
+Foundation of JPA.
+Defines schema structure.
+
+Example:
+
+```java
+@Entity
+@Table(name="categories")
+```
+
+---
+
+# 5. DTO Layer
+
+### 📍 Role:
+
+Transfer data between client and server.
+
+### 📌 Responsibilities:
+
+* Structure request data
+* Structure response data
+* Hide entity internals
+
+### 🎯 Significance:
+
+Prevents exposing DB structure directly.
+Improves API security & clarity.
+
+Example:
+
+```java
+ApiResponseDTO<T>
+```
+
+---
+
+# 6. Exception Handling Layer
+
+### 📍 Role:
+
+Centralized error handling.
+
+### 📌 Responsibilities:
+
+* Catch exceptions globally
+* Convert exceptions into structured JSON
+* Return proper HTTP status
+
+### 🎯 Significance:
+
+Prevents messy try-catch blocks.
+Standardizes error responses.
+
+Example:
+
+```java
+@RestControllerAdvice
+```
+
+---
+
+# 7. Configuration Layer
+
+### 📍 Role:
+
+Defines application-level configuration.
+
+### 📌 Responsibilities:
+
+* Define beans
+* Swagger config
+* AOP enablement
+* Custom properties
+
+### 🎯 Significance:
+
+Controls application behavior.
+Keeps configuration separate from logic.
+
+---
+
+# 8. Aspect (AOP) Layer
+
+### 📍 Role:
+
+Handles cross-cutting concerns.
+
+### 📌 Responsibilities:
+
+* Logging
+* Execution timing
+* Monitoring
+
+### 🎯 Significance:
+
+Keeps logging separate from business logic.
+Cleaner architecture.
+
+Example:
+
+```java
+@Aspect
+```
+
+---
+
+# 9. Runner Layer
+
+### 📍 Role:
+
+Executes code at startup.
+
+### 📌 Responsibilities:
+
+* Insert initial data
+* Perform startup logic
+
+### 🎯 Significance:
+
+Demonstrates application lifecycle.
+
+Example:
+
+```java
+implements CommandLineRunner
+```
+
+---
+
+# 🔟 Health / Actuator Layer
+
+### 📍 Role:
+
+Monitors application health.
+
+### 📌 Responsibilities:
+
+* Provide health status
+* Show metrics
+* Show environment data
+
+### 🎯 Significance:
+
+Production monitoring.
+
+---
+
+# 🧠 Why Layered Architecture Is Important
+
+✔ Separation of Concerns
+✔ Easier testing
+✔ Better maintainability
+✔ Cleaner debugging
+✔ Industry standard design
+✔ Scalable architecture
+
+---
+
+# 🚀 Final Request Lifecycle (Complete View)
+
+```
+Client
+↓
+Controller
+↓
+Service  ← AOP intercepts here
+↓
+Repository
+↓
+Database
+
+Exceptions → GlobalExceptionHandler
+Response → ApiResponseDTO
+```
+
+---
+
+# 🎓 Big Picture Understanding
+
+Our application is not just CRUD.
+
+It demonstrates:
+
+* Clean architecture
+* Professional layering
+* Transaction management
+* Centralized error handling
+* Cross-cutting concern handling
+* Production readiness
+
+---

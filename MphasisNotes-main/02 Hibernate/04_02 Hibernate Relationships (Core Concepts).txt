@@ -1,0 +1,299 @@
+
+# 🟢 Hibernate Relationships – Core Concepts
+
+We will cover:
+
+1. Cascade
+2. Owning Side
+3. Uni-directional Mapping
+4. Bi-directional Mapping
+
+---
+
+# 1. Uni-directional Mapping
+
+## What is Uni-directional?
+
+Relationship is defined in **only one entity**.
+
+Example:
+
+Department knows Employees.
+Employee does NOT know Department.
+
+---
+
+## Example – Uni-directional OneToMany
+
+### Department Entity
+
+```java
+@Entity
+public class Department {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    private String name;
+
+    @OneToMany
+    @JoinColumn(name = "dept_id")  // Foreign key in Employee table
+    private List<Employee> employees;
+}
+```
+
+### Employee Entity
+
+```java
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    private String name;
+}
+```
+
+Here:
+
+* Only Department has relationship
+* Employee has no reference to Department
+* Foreign key created in Employee table
+
+---
+
+# 2. Bi-directional Mapping
+
+## What is Bi-directional?
+
+Both entities know each other.
+
+Department → Employees
+Employee → Department
+
+---
+
+### Department Entity
+
+```java
+@Entity
+public class Department {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "department")
+    private List<Employee> employees;
+}
+```
+
+---
+
+### Employee Entity
+
+```java
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "dept_id")
+    private Department department;
+}
+```
+
+Now:
+
+* Department has list of employees
+* Employee has department reference
+* Relationship exists on both sides
+
+---
+
+# 3. Owning Side
+
+Very important concept.
+
+👉 The owning side is the entity that contains the foreign key.
+
+In our example:
+
+```java
+@ManyToOne
+@JoinColumn(name = "dept_id")
+private Department department;
+```
+
+Employee is the owning side.
+
+Because:
+
+* It has `@JoinColumn`
+* It controls the foreign key
+
+Department side:
+
+```java
+@OneToMany(mappedBy = "department")
+```
+
+This is the inverse side.
+
+---
+
+## Rule
+
+👉 The side without `mappedBy` is the owning side.
+👉 Only owning side updates the relationship in database.
+
+---
+
+# 4. Cascade
+
+---
+
+## What is Cascade?
+
+Cascade means:
+
+👉 When we perform an operation on parent,
+👉 The same operation automatically applies to child.
+
+Example:
+
+* Save parent
+* Child also gets saved automatically
+
+---
+
+## Without Cascade
+
+Let’s see what happens.
+
+### Save Department with Employees (Without Cascade)
+
+```java
+Department dept = new Department();
+dept.setName("IT");
+
+Employee e1 = new Employee();
+e1.setName("Amit");
+
+Employee e2 = new Employee();
+e2.setName("Rahul");
+
+dept.setEmployees(Arrays.asList(e1, e2));
+
+session.save(dept);  // Only department saved
+```
+
+Result:
+
+* Department saved
+* Employees NOT saved
+* Error may occur (transient object exception)
+
+Because cascade not defined.
+
+---
+
+## With Cascade
+
+Modify Department:
+
+```java
+@OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+private List<Employee> employees;
+```
+
+Now saving:
+
+```java
+Department dept = new Department();
+dept.setName("IT");
+
+Employee e1 = new Employee();
+e1.setName("Amit");
+e1.setDepartment(dept);
+
+Employee e2 = new Employee();
+e2.setName("Rahul");
+e2.setDepartment(dept);
+
+dept.setEmployees(Arrays.asList(e1, e2));
+
+session.save(dept);
+```
+
+Now:
+
+* Department saved
+* Employees saved automatically
+* Foreign key set properly
+
+---
+
+# 5. Cascade Types (Just Mention)
+
+* PERSIST
+* MERGE
+* REMOVE
+* REFRESH
+* ALL
+
+We mostly use:
+
+```java
+cascade = CascadeType.ALL
+```
+
+---
+
+# 6. Concept Summary
+
+## Uni-directional
+
+* One side knows the other
+* Simpler
+* Less flexible
+
+## Bi-directional
+
+* Both sides know each other
+* More natural
+* More common
+
+## Owning Side
+
+* Contains foreign key
+* No `mappedBy`
+* Controls relationship
+
+## Cascade
+
+* Propagates operations
+* Reduces manual saves
+
+---
+
+# 🎯 Strong Teaching Line
+
+You can conclude like this:
+
+> Relationship is controlled by owning side.
+> Cascade controls operation propagation.
+> Uni-directional is simple.
+> Bi-directional is powerful.
+
+---

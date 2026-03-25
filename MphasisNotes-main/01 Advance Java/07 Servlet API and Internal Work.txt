@@ -1,0 +1,103 @@
+
+# Servlet API – Overview & Data Flow
+
+---
+
+## 1. What is Servlet API?
+
+### Simple Definition
+
+=> **Servlet API is a set of classes and interfaces provided by Java EE / Jakarta EE to build web applications.**
+
+It helps us:
+
+* receive HTTP requests
+* process data
+* send HTTP responses
+
+👉 Servlets work **only because of the Servlet API**.
+
+---
+
+## 2. Servlet API – Class Hierarchy (High Level)
+
+```
+Servlet
+  ↑
+GenericServlet
+  ↑
+HttpServlet
+  ↑
+Our Custom Servlet
+```
+
+---
+
+## 3. Important Classes & Interfaces (1–2 Lines Each)
+
+### 3.1 Servlet (Interface)
+
+=> Base interface that defines the servlet lifecycle methods.
+
+---
+
+### 3.2 GenericServlet (Abstract Class)
+
+=> Protocol-independent servlet; provides basic lifecycle implementation.
+
+👉 Rarely used directly.
+
+---
+
+### 3.3 HttpServlet (Abstract Class)
+
+=> HTTP-specific servlet class that supports `doGet()`, `doPost()` etc.
+
+👉 **Most important class for us**.
+
+---
+
+### 3.4 HttpServletRequest
+
+=> Represents the **incoming request** from the client.
+
+Used to:
+
+* read form data
+* read URL parameters
+* read headers
+
+---
+
+### 3.5 HttpServletResponse
+
+=> Represents the **response sent to the client**.
+
+Used to:
+
+* send output
+* set content type
+* redirect response
+
+---
+
+### 3.6 ServletContext
+
+=> Represents the **entire web application**.
+
+Used for:
+
+* shared data
+* application-level configuration
+
+---
+
+### 3.7 ServletConfig
+
+=> Represents **configuration of one servlet**.
+
+Used for:
+
+* servlet-specific parameters
+
+---

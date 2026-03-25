@@ -1,0 +1,247 @@
+
+# 📂 CATEGORY API CHART
+
+---
+
+# 1.  Create Category
+
+### 🔹 POST `/api/v1/categories`
+
+### ✅ Request JSON
+
+```json
+{
+  "name": "Grocery",
+  "description": "Daily use items"
+}
+```
+
+---
+
+### ✅ Success Response (201 CREATED)
+
+```json
+{
+  "timestamp": "2026-02-15T12:00:00",
+  "status": 201,
+  "message": "Category created successfully",
+  "data": {
+    "id": 4,
+    "name": "Grocery",
+    "description": "Daily use items"
+  }
+}
+```
+
+---
+
+### ❌ Error Response (400 Bad Request)
+
+```json
+{
+  "timestamp": "2026-02-15T12:00:00",
+  "status": 400,
+  "message": "Category name already exists",
+  "data": null
+}
+```
+
+---
+
+# 2.  Get All Categories
+
+### 🔹 GET `/api/v1/categories`
+
+---
+
+### ✅ Success Response (200 OK)
+
+```json
+{
+  "timestamp": "2026-02-15T12:05:00",
+  "status": 200,
+  "message": "Categories fetched successfully",
+  "data": [
+    {
+      "id": 1,
+      "name": "Electronics",
+      "description": "Electronic gadgets"
+    },
+    {
+      "id": 2,
+      "name": "Books",
+      "description": "All kinds of books"
+    }
+  ]
+}
+```
+
+---
+
+### ❌ Error Response (500 Internal Server Error)
+
+```json
+{
+  "timestamp": "2026-02-15T12:05:00",
+  "status": 500,
+  "message": "Internal Server Error",
+  "data": null
+}
+```
+
+---
+
+# 3.  Get Category By ID
+
+### 🔹 GET `/api/v1/categories/{id}`
+
+Example:
+
+```
+GET /api/v1/categories/1
+```
+
+---
+
+### ✅ Success (200 OK)
+
+```json
+{
+  "timestamp": "2026-02-15T12:10:00",
+  "status": 200,
+  "message": "Category fetched successfully",
+  "data": {
+    "id": 1,
+    "name": "Electronics",
+    "description": "Electronic gadgets"
+  }
+}
+```
+
+---
+
+### ❌ Not Found (404)
+
+```json
+{
+  "timestamp": "2026-02-15T12:10:00",
+  "status": 404,
+  "message": "Category with id 10 not found",
+  "data": null
+}
+```
+
+---
+
+# 4.  Update Category
+
+### 🔹 PUT `/api/v1/categories/{id}`
+
+Example:
+
+```
+PUT /api/v1/categories/1
+```
+
+---
+
+### ✅ Request JSON
+
+```json
+{
+  "name": "Electronics Updated",
+  "description": "Updated description"
+}
+```
+
+---
+
+### ✅ Success (200 OK)
+
+```json
+{
+  "timestamp": "2026-02-15T12:15:00",
+  "status": 200,
+  "message": "Category updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Electronics Updated",
+    "description": "Updated description"
+  }
+}
+```
+
+---
+
+### ❌ Not Found (404)
+
+```json
+{
+  "timestamp": "2026-02-15T12:15:00",
+  "status": 404,
+  "message": "Category not found",
+  "data": null
+}
+```
+
+---
+
+# 5.  Delete Category
+
+### 🔹 DELETE `/api/v1/categories/{id}`
+
+Example:
+
+```
+DELETE /api/v1/categories/3
+```
+
+---
+
+### ✅ Success (200 OK)
+
+```json
+{
+  "timestamp": "2026-02-15T12:20:00",
+  "status": 200,
+  "message": "Category deleted successfully",
+  "data": null
+}
+```
+
+---
+
+### ❌ Not Found (404)
+
+```json
+{
+  "timestamp": "2026-02-15T12:20:00",
+  "status": 404,
+  "message": "Category not found",
+  "data": null
+}
+```
+
+---
+
+# 📊 Final Category API Summary Table
+
+| Method | Endpoint                | Purpose            | Status    |
+| ------ | ----------------------- | ------------------ | --------- |
+| POST   | /api/v1/categories      | Create category    | 201       |
+| GET    | /api/v1/categories      | Get all categories | 200       |
+| GET    | /api/v1/categories/{id} | Get by ID          | 200 / 404 |
+| PUT    | /api/v1/categories/{id} | Update             | 200 / 404 |
+| DELETE | /api/v1/categories/{id} | Delete             | 200 / 404 |
+
+---
+
+# 🎯 What This Demonstrates
+
+✔ Proper REST naming
+✔ Correct HTTP status codes
+✔ Consistent response wrapper
+✔ Centralized error handling integration
+✔ Clean production-style API
+
+---

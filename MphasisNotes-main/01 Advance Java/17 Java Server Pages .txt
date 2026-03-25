@@ -1,0 +1,316 @@
+
+# Java Server Pages (JSP)
+
+---
+
+## 1. What is JSP?
+
+### Simple Definition
+
+=> *JSP (Java Server Pages)* is a technology used to create *dynamic web pages using Java*.
+
+A JSP file:
+
+* looks like HTML
+* contains Java code
+* runs on the server
+* generates HTML response
+
+👉 JSP = easier way to write servlets
+
+---
+
+## 2. Why JSP Exists (Use Case)
+
+Without JSP:
+
+* Servlets must write HTML using `PrintWriter`
+* Code becomes messy
+
+Example servlet output:
+
+```java
+out.println("<h1>Hello</h1>");
+```
+
+👉 Hard to maintain
+👉 Hard to read
+
+With JSP:
+
+```html
+<h1>Hello</h1>
+```
+
+👉 Clean
+👉 Natural for UI
+
+---
+
+## 3. How JSP Works Internally (Very Important)
+
+=> A JSP is automatically converted into a servlet by the server.
+
+Flow:
+
+```
+JSP file
+   ↓
+Converted to Servlet
+   ↓
+Compiled
+   ↓
+Executed
+   ↓
+HTML sent to browser
+```
+
+You write JSP → server runs servlet.
+
+Students should know:
+
+=> JSP is NOT magic — it is a servlet generator.
+
+---
+
+## 4. JSP Life Cycle
+
+JSP lifecycle is similar to servlet lifecycle.
+
+### Steps:
+
+1. JSP translated into servlet
+2. Servlet compiled
+3. Servlet class loaded
+4. JSP initialized
+5. JSP serves requests
+6. JSP destroyed
+
+---
+
+### Lifecycle Methods (Internal)
+
+| JSP Phase          | Equivalent Servlet Method |
+| ------------------ | ------------------------- |
+| Initialization     | `jspInit()`               |
+| Request processing | `_jspService()`           |
+| Destruction        | `jspDestroy()`            |
+
+👉 `_jspService()` runs for every request
+
+---
+
+## JSP tags
+
+=> If we write Java Code inside an HTML page, it will be printed a plain text.
+=> If we want Java code not be printed but executed, we have to use JSP Tags.
+
+There are many types of JSP tags.
+
+The main are:
+
+=> Scriptlet Tag
+=> Expression Tag
+=> Declaration Tags
+
+---
+
+## 5. JSP Scriptlet Tags
+
+### Syntax
+
+```jsp
+<% Java code %>
+```
+
+### Meaning
+
+=> Scriptlet allows writing Java statements inside JSP.
+
+---
+
+### Example
+
+```jsp
+<%
+int x = 10;
+out.println(x);
+%>
+```
+
+---
+
+### Use Case
+
+* Conditional logic
+* Loops
+* Calculations
+
+---
+
+### Warning
+
+=> Scriptlets are old style.
+=> Modern JSP avoids heavy Java code.
+
+But we learn them to understand JSP internals.
+
+---
+
+## 6. JSP Expression Tags
+
+### Syntax
+
+```jsp
+<%= expression %>
+```
+
+### Meaning
+
+=> Expression prints a value directly to output.
+
+Equivalent to:
+
+```java
+out.println(value);
+```
+
+---
+
+### Example
+
+```jsp
+<%= 5 + 5 %>
+```
+
+Output:
+
+```
+10
+```
+
+---
+
+### Use Case
+
+* Display variables
+* Display results
+* Show request data
+
+---
+
+## 7. JSP Declaration Tags
+
+### Syntax
+
+```jsp
+<%! code %>
+```
+
+### Meaning
+
+=> Declaration defines variables or methods at class level.
+
+These become:
+
+* instance variables
+* methods inside generated servlet
+
+---
+
+### Example
+
+```jsp
+<%! int counter = 0; %>
+```
+
+This variable belongs to the servlet object.
+
+---
+
+### Use Case
+
+* Shared variables
+* Utility methods
+
+---
+
+## 8. JSP Implicit Objects
+
+JSP automatically provides built-in objects.
+
+We don’t create them — they already exist.
+
+---
+
+### Most Important Implicit Objects
+
+| Object      | Type                | Purpose         |
+| ----------- | ------------------- | --------------- |
+| request     | HttpServletRequest  | client data     |
+| response    | HttpServletResponse | server response |
+| session     | HttpSession         | user session    |
+| application | ServletContext      | app-level data  |
+| out         | JspWriter           | output          |
+| config      | ServletConfig       | servlet config  |
+| pageContext | PageContext         | JSP context     |
+| page        | Object              | current JSP     |
+| exception   | Throwable           | error handling  |
+
+---
+
+### Example: Using request object
+
+```jsp
+<%= request.getParameter("name") %>
+```
+
+---
+
+### Example: Using out object
+
+```jsp
+<%
+out.println("Hello JSP");
+%>
+```
+
+---
+
+## 9. JSP vs Servlet (Clear Comparison)
+
+| Feature         | Servlet | JSP      |
+| --------------- | ------- | -------- |
+| Focus           | Logic   | UI       |
+| Writes HTML     | Hard    | Easy     |
+| Java code       | Primary | Embedded |
+| Maintainability | Low     | High     |
+
+👉 JSP = presentation layer
+👉 Servlet = controller layer
+
+This leads to MVC (next topic).
+
+---
+
+## 🔟 One-Line Memory Rules
+
+* Servlets = Java + HTML
+* JSP = HTML + Java
+* JSP becomes a servlet
+* Scriptlet = Java code
+* Expression = print value
+* Declaration = class-level code
+* Implicit objects = built-in helpers
+
+---
+
+## Key Takeaways
+
+* JSP simplifies UI generation
+* Lifecycle similar to servlet
+* Tags control Java insertion
+* Implicit objects save boilerplate
+* JSP is built on servlet technology
+
+---

@@ -1,0 +1,281 @@
+
+# 🟢 Criteria API in Hibernate
+
+---
+
+# 1️. What is Criteria API?
+
+Criteria API is:
+
+* A **programmatic way** to build queries
+* No HQL string writing
+* Query built using Java objects
+* Type-safe (compared to string HQL)
+
+Instead of:
+
+```java
+"from Employee e where e.salary > :sal"
+```
+
+We write Java-based query construction.
+
+---
+
+# 2️. Why Do We Need Criteria API?
+
+Problem with HQL:
+
+* String based
+* Errors detected at runtime
+* Hard to build dynamic conditions
+
+Criteria solves:
+
+* No string queries
+* Easy to build dynamic filters
+* More type safety
+
+---
+
+# 3️. Basic Structure of Criteria Query
+
+Steps:
+
+1. Get `CriteriaBuilder`
+2. Create `CriteriaQuery`
+3. Define `Root`
+4. Add conditions
+5. Execute query
+
+---
+
+# 4️. Simple SELECT (Find All)
+
+Equivalent to:
+
+```java
+from Employee
+```
+
+Criteria version:
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+
+Root<Employee> root = cq.from(Employee.class);
+
+cq.select(root);
+
+Query<Employee> query = session.createQuery(cq);
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 5️. SELECT with Condition
+
+Equivalent HQL:
+
+```java
+from Employee e where e.salary > :sal
+```
+
+Criteria version:
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+
+Root<Employee> root = cq.from(Employee.class);
+
+cq.select(root)
+  .where(cb.gt(root.get("salary"), new BigDecimal("60000")));
+
+Query<Employee> query = session.createQuery(cq);
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 6️. Multiple Conditions
+
+Equivalent HQL:
+
+```java
+from Employee e
+where e.salary > :sal and e.grade = :g
+```
+
+Criteria version:
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+
+Root<Employee> root = cq.from(Employee.class);
+
+Predicate salaryCondition =
+        cb.gt(root.get("salary"), new BigDecimal("60000"));
+
+Predicate gradeCondition =
+        cb.equal(root.get("grade"), 'A');
+
+cq.select(root)
+  .where(cb.and(salaryCondition, gradeCondition));
+
+Query<Employee> query = session.createQuery(cq);
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 7️. LIKE Condition
+
+Equivalent HQL:
+
+```java
+from Employee e where e.name like :pattern
+```
+
+Criteria:
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+
+Root<Employee> root = cq.from(Employee.class);
+
+cq.select(root)
+  .where(cb.like(root.get("name"), "A%"));
+
+Query<Employee> query = session.createQuery(cq);
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 8️. ORDER BY
+
+Equivalent HQL:
+
+```java
+from Employee e order by e.salary desc
+```
+
+Criteria:
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+
+Root<Employee> root = cq.from(Employee.class);
+
+cq.select(root)
+  .orderBy(cb.desc(root.get("salary")));
+
+Query<Employee> query = session.createQuery(cq);
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 9️. Returning Specific Field
+
+Equivalent HQL:
+
+```java
+select e.name from Employee e
+```
+
+Criteria:
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<String> cq = cb.createQuery(String.class);
+
+Root<Employee> root = cq.from(Employee.class);
+
+cq.select(root.get("name"));
+
+Query<String> query = session.createQuery(cq);
+List<String> names = query.getResultList();
+```
+
+---
+
+# 🔟 Aggregation – COUNT
+
+Equivalent HQL:
+
+```java
+select count(e) from Employee e
+```
+
+Criteria:
+
+```java
+CriteriaBuilder cb = session.getCriteriaBuilder();
+CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+
+Root<Employee> root = cq.from(Employee.class);
+
+cq.select(cb.count(root));
+
+Query<Long> query = session.createQuery(cq);
+Long total = query.getSingleResult();
+```
+
+---
+
+# 11️. Pagination
+
+Same as HQL:
+
+```java
+Query<Employee> query = session.createQuery(cq);
+
+query.setFirstResult(0);
+query.setMaxResults(5);
+
+List<Employee> list = query.getResultList();
+```
+
+---
+
+# 12️. Criteria vs HQL
+
+| HQL                      | Criteria                 |
+| ------------------------ | ------------------------ |
+| String based             | Object based             |
+| Easier to read           | More verbose             |
+| Runtime errors           | More type safe           |
+| Hard for dynamic filters | Good for dynamic filters |
+
+---
+
+# 13️. Advantages
+
+✅ No string query
+✅ Better for dynamic conditions
+✅ More type-safe
+✅ Good for search filters
+
+---
+
+# 14️. Disadvantages
+
+❌ Verbose
+❌ Harder to read
+❌ More boilerplate
+❌ Slightly complex for beginners
+
+---
+
+# 🎯 Summary
+
+> Use HQL when query is simple and fixed.
+> Use Criteria when query needs to be built dynamically at runtime.
+
+---

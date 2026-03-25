@@ -1,0 +1,41 @@
+Rq1: http://localhost:8085/RequestResponse/  (Handled by Web Server)
+
+Rsp1 : launcher.html
+
+---
+
+Rq2: http://localhost:8085/RequestResponse/ex02_login_page.html (Handled by Web Server)
+
+Rsp2 : ex02_login_page.html
+
+---
+
+Rq3: http://localhost:8085/RequestResponse/login (Handled by Web Container)
+
+Rsp3: Redirect instruction: Go to 'ex04_login_success.html'
+
+Rq4: http://localhost:8085/RequestResponse/ex04_login_success.html (Handled by Web Server)
+Rsp4: ex04_login_success.html
+
+---
+
+Rq5: http://localhost:8085/RequestResponse/google_search (Handled by Web Container)
+Rsp5: https://www.google.com/search?q=Java
+
+Rq6: https://www.google.com/search?q=Java (Handled by Googles Server)
+Rsp6: page from google
+
+---
+
+RequestDispatcher 
+
+include and forward
+
+Rq6: http://localhost:8085/RequestResponse/set_rate?previous_units=100&current_units=120
+
+Rsp6 : 
+
+In case of include will come from: s1 + s2
+In case of forward will come from: s2
+
+---

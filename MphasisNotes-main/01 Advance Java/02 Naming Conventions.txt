@@ -1,0 +1,291 @@
+
+# Naming Conventions
+
+=> *Goal:*
+=> Good naming makes code readable, debuggable, and professional.
+=> Bad naming makes even correct code look wrong.
+
+---
+
+## 1. Core Java Naming Conventions
+
+### ✅ Project Name
+
+*Rule*
+
+=> Project names must be *nouns* and written in *PascalCase*.
+
+*Correct*
+
+```java
+JeePractice
+ServletsDemo
+WebProgramming
+```
+
+*Wrong*
+
+```java
+jeepractice
+servletDemo
+wp
+```
+
+---
+
+### ✅ Class Names
+
+*Rule*
+
+=> Class names must be *nouns* and written in *PascalCase*.
+
+*Correct*
+
+```java
+Student
+EmployeeService
+LoginServlet
+```
+
+*Wrong*
+
+```java
+student
+student_class
+loginservlet
+```
+
+---
+
+### ✅ Variable Names
+
+*Rule*
+
+=> Variables must be written in *camelCase* and should describe the data.
+
+*Correct*
+
+```java
+int totalMarks;
+double simpleInterest;
+String userName;
+```
+
+*Wrong*
+
+```java
+int x;
+double si1;
+String n;
+```
+
+---
+
+### ✅ Method Names
+
+*Rule*
+
+=> Method names must be *verbs* and written in *camelCase*.
+
+*Correct*
+
+```java
+calculateInterest()
+getStudentName()
+validateLogin()
+```
+
+*Wrong*
+
+```java
+Calculation()
+getname()
+LoginCheck()
+```
+
+---
+
+### ✅ Constant Names
+
+*Rule*
+
+=> Constants must be written in *UPPER_CASE* with underscores.
+
+*Correct*
+
+```java
+final int MAX_LIMIT = 100;
+final String ADMIN_ROLE = "ADMIN";
+```
+
+---
+
+## 2. Package Naming Conventions
+
+### ✅ Rule
+
+=> Package names must be *lowercase* and follow reverse-domain style.
+
+*Correct*
+
+```java
+com.company.project.controller
+com.company.project.service
+```
+
+*Wrong*
+
+```java
+Com.Project
+myPackage
+Servlets
+```
+
+---
+
+## 3. Servlet Naming Conventions
+
+### ✅ Servlet Class Names
+
+*Rule*
+
+=> Servlet class names must end with *Servlet*.
+
+*Correct*
+
+```java
+LoginServlet
+RegisterServlet
+ProductServlet
+```
+
+*Wrong*
+
+```java
+Login
+login_servlet
+LoginPage
+```
+
+---
+
+### ✅ URL Mapping Names
+
+*Rule*
+
+=> URL patterns should be *lowercase*, short, and meaningful.
+
+*Correct*
+
+```java
+/login
+/register
+/products
+```
+
+*Wrong*
+
+```java
+/LoginServlet
+/doLoginNow
+/Login_Page
+```
+
+---
+
+## 4. HTML File Naming Conventions
+
+### ✅ Rule
+
+=> HTML file names must be:
+
+* lowercase
+* meaningful
+* no spaces
+
+*Correct*
+
+```html
+login.html
+register.html
+product_list.html
+```
+
+*Wrong*
+
+```html
+Login.html
+login page.html
+Page1.html
+```
+
+---
+
+## 5. CSS File Naming Conventions
+
+### ✅ Rule
+
+=> CSS file names must be *lowercase* and related to purpose.
+
+*Correct*
+
+```css
+style.css
+login.css
+main_layout.css
+```
+
+*Wrong*
+
+```css
+StyleSheet.css
+MyCSS.css
+newfile1.css
+```
+
+---
+
+## 6. Form Field Naming (VERY IMPORTANT)
+
+### ✅ Rule
+
+=> `name` attribute values must be:
+
+* lowercase
+* meaningful
+* match backend usage
+
+*Correct*
+
+```html
+<input type="text" name="user_name">
+<input type="password" name="password">
+```
+
+*Wrong*
+
+```html
+<input name="t1">
+<input name="pwd123">
+```
+
+Backend consistency:
+
+```java
+request.getParameter("user_name");
+```
+
+---
+
+## 7. One Golden Rule
+
+=> *If someone else cannot understand our code by reading names,
+=> the names are wrong.*
+
+Good naming:
+
+* reduces bugs
+* reduces explanation
+* increases confidence
+
+---

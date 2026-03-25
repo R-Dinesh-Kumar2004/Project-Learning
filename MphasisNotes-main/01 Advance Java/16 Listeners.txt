@@ -1,0 +1,313 @@
+
+# Listeners in Java Web Applications
+
+---
+
+## 1. What is a Listener?
+
+### Simple Definition
+
+> A **Listener** is a component that **listens to lifecycle events** in a web application.
+
+Listeners **do not handle requests**.
+They **observe events** and react automatically.
+
+---
+
+## 2. Why Do We Need Listeners? (Very Important)
+
+Listeners are used when we want to:
+
+* perform some action **automatically**
+* without waiting for a request
+* when something is **created or destroyed**
+
+### Common Use Cases
+
+* Application startup logic
+* Resource initialization
+* Logging
+* Counting users
+* Cleanup at shutdown
+
+👉 Listeners are **event-driven**, not request-driven.
+
+---
+
+## 3. Types of Listener Interfaces (We Will Study)
+
+In this section, we focus on:
+
+1. `ServletContextListener`
+2. `ServletRequestListener`
+3. `HttpSessionListener`
+
+---
+
+## 4. ServletContextListener
+
+---
+
+### 4.1 What is ServletContextListener?
+
+> Listens to **application-level lifecycle events**.
+
+It reacts when:
+
+* application starts
+* application stops
+
+---
+
+### 4.2 When Are These Events Fired?
+
+* When application is deployed → **context initialized**
+* When application is stopped/redeployed → **context destroyed**
+
+---
+
+### 4.3 Interface Methods
+
+```java
+void contextInitialized(ServletContextEvent sce);
+void contextDestroyed(ServletContextEvent sce);
+```
+
+---
+
+### 4.4 Why Do We Need ServletContextListener? (Use Case)
+
+Used for:
+
+* initializing global resources
+* loading configuration
+* setting application-wide data
+* cleanup before shutdown
+
+Example use cases:
+
+* open database connection pool
+* load configuration files
+* initialize counters
+
+---
+
+### 4.5 Simple Example
+
+```java
+public class AppStartupListener implements ServletContextListener {
+
+    public void contextInitialized(ServletContextEvent sce) {
+        System.out.println("Application started");
+    }
+
+    public void contextDestroyed(ServletContextEvent sce) {
+        System.out.println("Application stopped");
+    }
+}
+```
+
+---
+
+## 5. ServletRequestListener
+
+---
+
+### 5.1 What is ServletRequestListener?
+
+> Listens to **request-level lifecycle events**.
+
+It reacts when:
+
+* a request is created
+* a request is destroyed
+
+---
+
+### 5.2 When Is This Triggered?
+
+* Every time a browser sends a request
+* Every time response is completed
+
+---
+
+### 5.3 Interface Methods
+
+```java
+void requestInitialized(ServletRequestEvent sre);
+void requestDestroyed(ServletRequestEvent sre);
+```
+
+---
+
+### 5.4 Why Do We Need ServletRequestListener? (Use Case)
+
+Used for:
+
+* request logging
+* performance monitoring
+* tracking request count
+* debugging
+
+Example:
+
+* log request start and end time
+* measure request processing time
+
+---
+
+### 5.5 Simple Example
+
+```java
+public class RequestLoggerListener implements ServletRequestListener {
+
+    public void requestInitialized(ServletRequestEvent sre) {
+        System.out.println("Request started");
+    }
+
+    public void requestDestroyed(ServletRequestEvent sre) {
+        System.out.println("Request ended");
+    }
+}
+```
+
+---
+
+## 6. HttpSessionListener
+
+---
+
+### 6.1 What is HttpSessionListener?
+
+> Listens to **session lifecycle events**.
+
+It reacts when:
+
+* session is created
+* session is destroyed
+
+---
+
+### 6.2 When Is Session Created or Destroyed?
+
+Session is created:
+
+* when `getSession()` is called for the first time
+
+Session is destroyed:
+
+* when session expires
+* when `invalidate()` is called
+* when application shuts down
+
+---
+
+### 6.3 Interface Methods
+
+```java
+void sessionCreated(HttpSessionEvent se);
+void sessionDestroyed(HttpSessionEvent se);
+```
+
+---
+
+### 6.4 Why Do We Need HttpSessionListener? (Use Case)
+
+Used for:
+
+* counting active users
+* tracking logins/logouts
+* cleaning session resources
+
+Example:
+
+* increment counter on login
+* decrement counter on logout
+
+---
+
+### 6.5 Simple Example
+
+```java
+public class SessionCounterListener implements HttpSessionListener {
+
+    public void sessionCreated(HttpSessionEvent se) {
+        System.out.println("Session created");
+    }
+
+    public void sessionDestroyed(HttpSessionEvent se) {
+        System.out.println("Session destroyed");
+    }
+}
+```
+
+---
+
+## 7. Where Do Listeners Fit in Request Cycle?
+
+```
+Application Start
+   ↓
+ServletContextListener
+   ↓
+Request Comes
+   ↓
+ServletRequestListener
+   ↓
+Filter
+   ↓
+Servlet
+   ↓
+Filter
+   ↓
+ServletRequestListener
+   ↓
+Session Events (if any)
+```
+
+Managed by **Apache Tomcat**.
+
+---
+
+## 8. Listener Configuration (Brief)
+
+Listeners are registered in `web.xml`:
+
+```xml
+<listener>
+    <listener-class>com.app.listener.AppStartupListener</listener-class>
+</listener>
+```
+
+👉 Once registered, container calls them automatically.
+
+---
+
+## 9. Listener vs Filter vs Servlet (Very Important)
+
+| Aspect             | Listener | Filter    | Servlet |
+| ------------------ | -------- | --------- | ------- |
+| Trigger            | Event    | Request   | Request |
+| Purpose            | Observe  | Intercept | Process |
+| Business Logic     | ❌        | ❌         | ✅       |
+| Runs Automatically | ✅        | ✅         | ❌       |
+
+---
+
+## 🔟 One-Line Memory Rules (Tell Students)
+
+* **Listener listens**
+* **Filter intercepts**
+* **Servlet processes**
+
+---
+
+## Key Takeaways
+
+* Listeners react to lifecycle events
+* They don’t handle requests directly
+* Used for startup, shutdown, tracking
+* Complement filters and servlets
+* Foundation for enterprise applications
+
+---

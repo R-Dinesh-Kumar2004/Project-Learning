@@ -1,0 +1,298 @@
+
+# Servlet Lifecycle & Internal Working of Tomcat
+
+---
+
+## 1.  What is Servlet Lifecycle?
+
+### Simple Definition
+
+> **Servlet lifecycle describes the stages a servlet goes through from creation to destruction.**
+
+Lifecycle is **managed by the server**, not by us.
+
+👉 We **do not create servlet objects manually**.
+
+---
+
+## 2.  Who Manages Servlet Lifecycle?
+
+* Lifecycle is managed by the web container
+* Example container: **Apache Tomcat**
+
+👉 Tomcat:
+
+* creates servlet objects
+* initializes them
+* handles requests
+* destroys them
+
+---
+
+## 3.  Servlet Lifecycle Phases (High Level)
+
+A servlet goes through **three main phases**:
+
+1. **Loading & Instantiation**
+2. **Initialization**
+3. **Request Processing**
+4. **Destruction**
+
+---
+
+## 4.  Step-by-Step Internal Working of Tomcat
+
+Let’s walk through **exactly what happens internally**, in correct order.
+
+---
+
+## 4.1 Application Deployment Phase
+
+### Step 1.  – Application is Deployed
+
+* We run the project on Tomcat
+* Tomcat deploys the web application
+
+---
+
+### Step 2.  – Tomcat Reads `web.xml`
+
+Tomcat:
+
+* reads `web.xml`
+* loads:
+
+  * servlet definitions
+  * URL mappings
+  * context parameters
+  * filters
+  * welcome files
+
+👉 Configuration phase starts here.
+
+---
+
+## 4.2 ServletContext Creation (Application Level)
+
+### Step 3. – ServletContext Object is Created
+
+> **ServletContext represents the entire web application.**
+
+Tomcat:
+
+* creates **one ServletContext object**
+* creates it **once per application**
+* fills it with:
+
+  * context parameters
+  * application-level data
+
+👉 This object is **shared by all servlets**.
+
+---
+
+## 4.3 Servlet Loading & Instantiation
+
+### Step 4.  – Servlet Class is Loaded
+
+* Tomcat loads servlet class into memory
+* Happens:
+
+  * at first request (default), or
+  * at startup (if configured)
+
+---
+
+### Step 5.  – Servlet Object is Instantiated
+
+> Tomcat creates **only one object** of each servlet.
+
+Important rule:
+
+> **One servlet class → one servlet object → many requests**
+
+👉 This is why servlets must be **thread-safe**.
+
+---
+
+## 4.4 ServletConfig Creation & Initialization
+
+### Step 6.  – ServletConfig Object is Created
+
+> **ServletConfig contains servlet-specific configuration.**
+
+Tomcat:
+
+* creates one `ServletConfig` per servlet
+* reads `<init-param>` from `web.xml`
+* attaches it to servlet instance
+
+---
+
+### Step 7. `init()` Method is Called
+
+```java
+public void init() throws ServletException {
+    // initialization code
+}
+```
+
+* Called **only once**
+* Used for:
+
+  * resource initialization
+  * reading config values
+  * setting up connections
+
+👉 After `init()`, servlet is **ready to handle requests**.
+
+---
+
+## 4.5 Request Processing Phase (MOST IMPORTANT)
+
+This phase happens **for every request**.
+
+---
+
+### Step 8. Client Sends HTTP Request
+
+* Browser sends request
+* Example:
+
+  * GET
+  * POST
+
+---
+
+### Step 9. Request & Response Objects are Created
+
+Tomcat:
+
+* creates a **new HttpServletRequest object**
+* creates a **new HttpServletResponse object**
+
+👉 These objects are:
+
+* request-specific
+* created **for every request**
+* destroyed after response is sent
+
+---
+
+### Step 10. `service()` Method is Called
+
+```java
+public void service(HttpServletRequest req,
+                    HttpServletResponse res)
+```
+
+> `service()` is the **central method**.
+
+Tomcat:
+
+* calls `service()`
+* passes request and response objects
+
+---
+
+### Step 1. 1.  – `service()` Calls `doGet()` / `doPost()`
+
+Inside `service()`:
+
+* Tomcat checks HTTP method
+* Calls appropriate method:
+
+| HTTP Method | Method Called |
+| ----------- | ------------- |
+| GET         | `doGet()`     |
+| POST        | `doPost()`    |
+| PUT         | `doPut()`     |
+| DELETE      | `doDelete()`  |
+
+👉 **We override `doGet()` / `doPost()`**
+👉 **We never call `service()` ourselves**
+
+---
+
+### Step 1. 2.  – Response is Sent Back
+
+* Servlet writes response
+* Tomcat sends response to browser
+* Request–response cycle ends
+
+---
+
+## 4.6 Servlet Destruction Phase
+
+### Step 1. 3.  – `destroy()` Method is Called
+
+```java
+public void destroy() {
+    // cleanup code
+}
+```
+
+Called when:
+
+* application is stopped
+* server is shut down
+* application is redeployed
+
+Used for:
+
+* releasing resources
+* closing connections
+
+👉 Called **only once**
+
+---
+
+## 5.  Complete Lifecycle Flow (One Shot View)
+
+> **Deploy → ServletContext → Load Servlet → Create Object → Create Config → init() → request → service() → doGet()/doPost() → response → destroy()**
+
+Tell students to **read this multiple times**.
+
+---
+
+## 6.  Lifecycle Methods Summary Table
+
+| Method           | Called When     | How Many Times |
+| ---------------- | --------------- | -------------- |
+| Constructor      | Object creation | Once           |
+| init()           | Initialization  | Once           |
+| service()        | Every request   | Many           |
+| doGet()/doPost() | Based on method | Many           |
+| destroy()        | Shutdown        | Once           |
+
+---
+
+## 7.  Key Rules (Very Important)
+
+* Servlet object is **single**
+* Requests are **multiple**
+* Request & response objects are **new every time**
+* ServletContext is **application-wide**
+* ServletConfig is **servlet-specific**
+
+---
+
+## 8.  One-Line Interview Answers
+
+* **Who creates servlet?** → Container (Tomcat)
+* **How many servlet objects?** → One
+* **When is init() called?** → Once
+* **Who calls doGet()?** → service() method
+* **Who creates request/response?** → Container
+
+---
+
+## Key Takeaways
+
+* Servlet lifecycle is container-managed
+* Tomcat controls everything
+* We only write business logic
+* Understanding lifecycle removes fear of frameworks
+* Spring follows similar lifecycle ideas
+
+---

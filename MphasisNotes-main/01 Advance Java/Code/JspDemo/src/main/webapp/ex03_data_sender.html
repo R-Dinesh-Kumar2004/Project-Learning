@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Data Sender</title>
+</head>
+<body>
+	<h1>Data Sender</h1>
+	<form action="student_servlet" method="get">
+
+		<input type="text" name="name" placeholder="Enter name" /><br /> <input
+			type="number" name="mobileNumber" placeholder="Enter mobile number" /><br />
+
+		Admission Date<input type="date" name="admissionDate" /><br /> <select
+			name="main_subjects" multiple>
+			<option value="maths">Maths</option>
+			<option value="physics">Physics</option>
+			<option value="chemistry">Chemistry</option>
+			<option value="English">English</option>
+			<option value="social">Social</option>
+		</select> <input type="submit" value="Submit" /><br />
+	</form>
+</body>
+</html>

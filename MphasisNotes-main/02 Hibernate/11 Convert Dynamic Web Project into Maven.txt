@@ -1,0 +1,125 @@
+
+# Convert a Dynamic Web Project into a Maven Project
+
+---
+
+## ✅ Why Convert to Maven?
+
+When we convert:
+
+* No more manually adding JARs in `WEB-INF/lib`
+* Dependencies managed in `pom.xml`
+* Standard project structure
+* Easy CI/CD and deployment
+* Industry-standard setup
+
+---
+
+# 🔁 Method 1: Convert Existing Dynamic Web Project to Maven (Eclipse)
+
+### Step 1: Right Click Project
+
+`Right Click → Configure → Convert to Maven Project`
+
+If option is not visible:
+
+* Install **Maven Integration for Eclipse (m2e)**
+
+---
+
+### Step 2: Fill Maven Details
+
+* Group Id → `com.example`
+* Artifact Id → `project-name`
+* Packaging → `war`
+* Version → `1.0-SNAPSHOT`
+
+⚠ Important: Packaging must be `war` (not jar)
+
+Click Finish.
+
+---
+
+### Step 3: Fix Project Structure (Important)
+
+Maven standard structure should look like:
+
+```
+src/main/java
+src/main/resources
+src/main/webapp
+```
+
+Move:
+
+* All Java files → `src/main/java`
+* JSP, HTML, CSS → `src/main/webapp`
+* web.xml → `src/main/webapp/WEB-INF`
+
+If needed:
+Right click → Build Path → Configure Build Path → remove old `src` → add new source folder.
+
+---
+
+### Step 4: Add Servlet Dependency in pom.xml
+
+Example:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>5.0.0</version>
+        <scope>provided</scope>
+    </dependency>
+</dependencies>
+```
+
+If using older Tomcat (Servlet 4.0), use:
+
+```xml
+<groupId>javax.servlet</groupId>
+<artifactId>javax.servlet-api</artifactId>
+<version>4.0.1</version>
+```
+
+---
+
+### Step 5: Update Project
+
+Right click project →
+`Maven → Update Project`
+
+---
+
+### Step 6: Add Server Runtime (if removed)
+
+`Project → Properties → Targeted Runtimes → Select Tomcat`
+
+---
+
+# 🔥 Alternative (Cleaner Method – Recommended)
+
+Sometimes conversion creates mess.
+
+Better approach:
+
+1. Create New → Maven Project
+2. Select Archetype → `maven-archetype-webapp`
+3. Copy old code into new project
+
+This gives cleaner structure.
+
+---
+
+# 💡 Small Real-World Tip
+
+In enterprise:
+
+* We don’t use Dynamic Web Project.
+* We always create Maven or Gradle project from start.
+
+Dynamic Web Project is mostly academic / beginner-level setup.
+
+---

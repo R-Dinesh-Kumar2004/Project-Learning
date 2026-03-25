@@ -1,0 +1,272 @@
+
+# 📘 SbEcomApp – Annotations
+
+---
+
+## 🟢 Core Spring Boot
+
+### 1. @SpringBootApplication
+
+* Combines @Configuration, @ComponentScan, @EnableAutoConfiguration
+* Entry point of Spring Boot application
+
+---
+
+### 2. @Configuration
+
+* Marks class as configuration class
+* Used to define beans manually
+
+---
+
+### 3. @Value
+
+* Injects values from application.properties
+* Used for reading custom properties
+
+---
+
+## 🟢 Stereotype Annotations (Bean Registration)
+
+### 4. @Component
+
+* Registers class as Spring bean
+* Used for utilities, runners, etc.
+
+---
+
+### 5. @Service
+
+* Marks service layer bean
+* Indicates business logic class
+
+---
+
+### 6. @Repository
+
+* Marks repository layer bean
+* Enables exception translation for DB errors
+
+---
+
+### 7. @Controller
+
+* Marks class as MVC controller
+* Returns view (rarely used here)
+
+---
+
+### 8. @RestController
+
+* Combination of @Controller + @ResponseBody
+* Returns JSON response directly
+
+---
+
+### 9. @ControllerAdvice
+
+* Global exception handling
+* Applies to all controllers
+
+---
+
+## 🟢 Web Layer Annotations
+
+### 🔟 @RequestMapping
+
+* Maps base URL at class or method level
+* Supports multiple HTTP methods
+
+---
+
+### 11. @GetMapping
+
+* Handles HTTP GET requests
+* Shortcut for @RequestMapping(method=GET)
+
+---
+
+### 12. @PostMapping
+
+* Handles HTTP POST requests
+* Used for create operations
+
+---
+
+### 13. @PutMapping
+
+* Handles HTTP PUT requests
+* Used for update operations
+
+---
+
+### 14. @DeleteMapping
+
+* Handles HTTP DELETE requests
+* Used for delete operations
+
+---
+
+### 15. @PathVariable
+
+* Binds URL path value to method parameter
+* Used for /categories/{id}
+
+---
+
+### 16. @RequestParam
+
+* Binds query/form parameter to method parameter
+* Used for multipart fields
+
+---
+
+### 17. @ModelAttribute
+
+* Binds form-data to DTO object
+* Used for multipart file upload
+
+---
+
+### 18. @ExceptionHandler
+
+* Handles specific exception in advice class
+* Returns structured error response
+
+---
+
+## 🟢 JPA / Hibernate Annotations
+
+### 19. @Entity
+
+* Marks class as JPA entity
+* Maps class to DB table
+
+---
+
+### 20. @Table
+
+* Specifies table name
+* Used to customize table mapping
+
+---
+
+### 21. @Id
+
+* Marks primary key field
+* Mandatory for entity
+
+---
+
+### 22. @GeneratedValue
+
+* Auto-generates primary key
+* Strategy like IDENTITY, AUTO
+
+---
+
+### 23. @Column
+
+* Customizes column properties
+* Used for nullable, unique, length
+
+---
+
+### 24. @OneToMany
+
+* Defines one-to-many relationship
+* Used on inverse side
+
+---
+
+### 25. @ManyToOne
+
+* Defines many-to-one relationship
+* Used on owning side
+
+---
+
+### 26. @JoinColumn
+
+* Defines foreign key column
+* Specifies column name
+
+---
+
+## 🟢 Transaction Management
+
+### 27. @Transactional
+
+* Wraps method inside DB transaction
+* Commits or rolls back automatically
+
+---
+
+## 🟢 Runner
+
+### 28. @Component (on CommandLineRunner)
+
+* Registers runner as bean
+* Executes after context is ready
+
+---
+
+## 🟢 AOP (If Included)
+
+### 29. @Aspect
+
+* Marks class as Aspect
+* Used for cross-cutting concerns (logging)
+
+---
+
+### 30. @Before / @After
+
+* Executes before or after method execution
+* Used in logging aspect
+
+---
+
+## 🟢 Swagger
+
+### 31. @Operation
+
+* Describes API endpoint
+* Adds summary & description
+
+---
+
+### 32. @ApiResponse
+
+* Defines API response documentation
+* Used inside Swagger annotations
+
+---
+
+# 🎯 Total Coverage
+
+We have used annotations from:
+
+✔ Core Spring Boot
+✔ Web MVC
+✔ JPA
+✔ Transaction Management
+✔ AOP
+✔ Exception Handling
+✔ Swagger
+
+---
+
+# 🚀 Final Note
+
+All these annotations work together to:
+
+* Register beans
+* Configure infrastructure
+* Map entities
+* Handle web requests
+* Manage transactions
+* Handle exceptions
+* Document APIs
+
+---

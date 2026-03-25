@@ -1,0 +1,629 @@
+
+# Java Refresher
+
+=> **Domain used:** Student Management
+=> **Goal:** Build Java understanding step by step the way real applications grow.
+
+---
+
+## 1. Class & Object
+
+### Rule
+
+=> A class is a blueprint.
+=> An object is a real instance created from the class.
+
+### Example
+
+```java
+class Student {
+    int id;
+    String name;
+}
+```
+
+Creating object:
+
+```java
+Student s = new Student();
+s.id = 1;
+s.name = "Amit";
+```
+
+👉 Everything in Java (Servlets, Spring beans, Hibernate entities) is built using this idea.
+
+---
+
+## 2. Constructors
+
+### Rule
+
+=> Constructor is used to initialize an object.
+
+### Example
+
+```java
+class Student {
+    int id;
+    String name;
+
+    Student(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+}
+```
+
+Usage:
+
+```java
+Student s = new Student(1, "Amit");
+```
+
+👉 Spring prefers constructor-based initialization.
+
+---
+
+## 3. Methods
+
+### Rule
+
+=> Methods define behavior of a class.
+
+### Example
+
+```java
+class Student {
+    int id;
+    String name;
+
+    void display() {
+        System.out.println(id + " " + name);
+    }
+}
+```
+
+👉 Servlet `doGet()` and `doPost()` are also just methods.
+
+---
+
+## 4. Encapsulation (Getters & Setters)
+
+### Rule
+
+=> Variables should be private and accessed via methods.
+
+### Example
+
+```java
+class Student {
+    private int id;
+    private String name;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+}
+```
+
+👉 Hibernate and Spring expect this pattern.
+
+---
+
+## 5. Aggregation (HAS-A relationship)
+
+### Rule
+
+=> One object contains another object.
+
+### Example
+
+```java
+class Address {
+    String city;
+    String state;
+}
+
+class Student {
+    int id;
+    String name;
+    Address address;
+}
+```
+
+👉 Real-world entities always have relationships.
+
+---
+
+## 6. Inheritance (IS-A relationship)
+
+### Rule
+
+=> Child class inherits properties of parent class.
+
+### Type 1: Single Inheritance
+
+```java
+class Person {
+    String name;
+}
+
+class Student extends Person {
+    int rollNo;
+}
+```
+
+### Type 2: Multilevel Inheritance
+
+```java
+class User {
+    String username;
+}
+
+class Person extends User {
+    String name;
+}
+
+class Student extends Person {
+    int rollNo;
+}
+```
+
+### Type 3: Hierarchical Inheritance
+
+```java
+class Person { }
+
+class Student extends Person { }
+class Teacher extends Person { }
+```
+
+👉 `HttpServlet` → our servlet is inheritance.
+
+---
+
+## 7. Abstract Classes
+
+### Rule
+
+=> Abstract class can have abstract and concrete methods.
+
+### Example
+
+```java
+abstract class User {
+    abstract void login();
+
+    void logout() {
+        System.out.println("Logout");
+    }
+}
+```
+
+```java
+class Student extends User {
+    void login() {
+        System.out.println("Student login");
+    }
+}
+```
+
+👉 Used when partial implementation is common.
+
+---
+
+## 8. Interfaces
+
+### Rule
+
+=> Interface defines a contract.
+
+### Example
+
+```java
+interface PaymentService {
+    void pay();
+}
+```
+
+```java
+class CardPayment implements PaymentService {
+    public void pay() {
+        System.out.println("Card payment");
+    }
+}
+```
+
+👉 Spring works heavily with interfaces.
+
+---
+
+## 9. Marker Interfaces
+
+### Rule
+
+=> Marker interface has **no methods** and is used for tagging.
+
+### Example
+
+```java
+interface Serializable { }
+```
+
+Usage:
+
+```java
+class Student implements Serializable {
+}
+```
+
+👉 JVM or framework checks presence of marker.
+
+---
+
+## 🔟 Functional Programming (Lambda – Basics)
+
+### Rule
+
+=> Lambda is used with functional interfaces (single abstract method).
+
+### Example
+
+```java
+interface Calculator {
+    int add(int a, int b);
+}
+```
+
+```java
+Calculator c = (a, b) -> a + b;
+System.out.println(c.add(10, 20));
+```
+
+👉 Spring uses lambdas internally and in streams.
+
+---
+
+## 11. Generics
+
+### Rule
+
+=> Generics provide type safety.
+
+### Example
+
+```java
+List<String> names = new ArrayList<>();
+names.add("Amit");
+```
+
+👉 Prevents runtime `ClassCastException`.
+
+---
+
+## 1️2. Collection Framework (Slightly Expanded – Practical View)
+
+### Rule
+
+=> Collections are used to store **multiple objects** in a single variable.
+
+---
+
+## 1️2️.1 List (Allows duplicates, maintains order)
+
+### Properties
+
+* Allows **duplicate values**
+* Maintains **insertion order**
+* Allows **multiple null values**
+
+### Example
+
+```java
+List<String> names = new ArrayList<>();
+
+names.add("Amit");
+names.add("Ravi");
+names.add("Amit");   // duplicate
+names.add(null);     // null allowed
+names.add("Neha");
+```
+
+### Observation
+
+```text
+[Amit, Ravi, Amit, null, Neha]
+```
+
+👉 Used when **order matters** and duplicates are allowed.
+
+---
+
+## 1️2️.2 Set (No duplicates)
+
+### Properties
+
+* **Does not allow duplicates**
+* Order is **not guaranteed**
+* Allows **at most one null** (HashSet)
+
+### Example
+
+```java
+Set<String> names = new HashSet<>();
+
+names.add("Amit");
+names.add("Ravi");
+names.add("Amit");   // duplicate ignored
+names.add(null);     // one null allowed
+names.add("Neha");
+```
+
+### Observation
+
+```text
+[Amit, Ravi, null, Neha]
+```
+
+👉 Used when **uniqueness is important**.
+
+---
+
+## 1️2️.3 Map (Key–Value pairs)
+
+### Properties
+
+* Stores data as **key → value**
+* **Keys must be unique**
+* Values **can be duplicate**
+* One null key allowed (HashMap)
+* Multiple null values allowed
+
+### Example
+
+```java
+Map<Integer, String> students = new HashMap<>();
+
+students.put(1, "Amit");
+students.put(2, "Ravi");
+students.put(3, "Amit");   // duplicate value allowed
+students.put(null, "Neha"); // one null key
+students.put(4, null);     // null value allowed
+```
+
+### Observation
+
+```text
+{1=Amit, 2=Ravi, 3=Amit, null=Neha, 4=null}
+```
+
+👉 Used heavily in:
+
+* request attributes
+* JSON structures
+* caching
+* Spring & Hibernate internals
+
+---
+
+## 1️2️.4 Quick Comparison Table
+
+| Collection | Duplicate | Order Maintained | Null Allowed |
+| ---------- | --------- | ---------------- | ------------ |
+| List       | Yes       | Yes              | Yes (many)   |
+| Set        | No        | No (HashSet)     | Yes (one)    |
+| Map Key    | No        | No               | Yes (one)    |
+| Map Value  | Yes       | —                | Yes          |
+
+
+---
+
+## 1️3. Exception Handling
+
+### Rule
+
+=> Exceptions handle runtime errors.
+
+### Example
+
+```java
+try {
+    int x = 10 / 0;
+} catch (Exception e) {
+    System.out.println("Error occurred");
+}
+```
+
+👉 Servlets throw exceptions; Spring handles many internally.
+
+---
+
+## 1️4. Wrapper Classes (Parse Methods Only)
+
+### Rule
+
+=> Wrapper classes convert String to primitive.
+
+### Examples
+
+```java
+int x = Integer.parseInt("10");
+double d = Double.parseDouble("12.5");
+```
+
+👉 Very important for request parameters in servlets.
+
+---
+
+## 1️5. Basic I/O
+
+### Rule
+
+=> Java I/O is used to read/write data.
+
+### Example
+
+```java
+File file = new File("data.txt");
+```
+
+(Concept only — detailed I/O not needed now)
+
+👉 Used in logging, file upload/download.
+
+---
+
+## 1️6. ## LocalDate (Java 8 Date API – Practical Use)
+
+### Rule
+
+=> `LocalDate` represents a **date without time** (year, month, day).
+
+👉 This is exactly what we need for:
+
+* Date of Birth
+* Joining Date
+* Registration Date
+
+---
+
+## 1. Creating LocalDate
+
+### Current Date
+
+```java
+LocalDate today = LocalDate.now();
+```
+
+---
+
+## 2. String → LocalDate (VERY IMPORTANT for Forms)
+
+=> Data coming from HTML forms is always **String**.
+
+### Example (Form Input)
+
+```text
+dob = "2000-05-10"
+```
+
+### Conversion
+
+```java
+LocalDate dob = LocalDate.parse("2000-05-10");
+```
+
+👉 Default format expected: `yyyy-MM-dd`
+(This matches `<input type="date">` perfectly)
+
+---
+
+## 3. LocalDate → String (For Display / Response)
+
+### Conversion
+
+```java
+LocalDate today = LocalDate.now();
+String dateStr = today.toString();
+```
+
+Output:
+
+```text
+2026-01-30
+```
+
+👉 Useful when sending date back to UI or response.
+
+---
+
+## 4. Common Operations on LocalDate
+
+### 4️.1 Calculate Age (Date of Birth → Age)
+
+### Example
+
+```java
+LocalDate dob = LocalDate.parse("2000-05-10");
+LocalDate today = LocalDate.now();
+
+int age = Period.between(dob, today).getYears();
+```
+
+👉 Very common interview and real-world requirement.
+
+---
+
+### 4️.2 Add or Subtract Days / Years
+
+### Example
+
+```java
+LocalDate today = LocalDate.now();
+
+LocalDate nextYear = today.plusYears(1);
+LocalDate lastWeek = today.minusDays(7);
+```
+
+👉 Used for:
+
+* expiry date
+* validity
+* subscriptions
+
+---
+
+### 4️.3 Get Individual Parts of Date
+
+### Example
+
+```java
+LocalDate date = LocalDate.now();
+
+int year = date.getYear();
+int month = date.getMonthValue();
+int day = date.getDayOfMonth();
+```
+
+👉 Useful for reports and validations.
+
+---
+
+## 5. Where This Is Used in Web Applications
+
+* Reading date from form
+* Calculating age
+* Storing date in database
+* Sending date in response
+* Validations (age > 18, expiry check, etc.)
+
+---
+
+=> “Form gives date as String, Java converts it to LocalDate, and then we can do calculations easily.”
+
+---
+
+## 1️7. String Class (Very Important)
+
+### Rule
+
+=> String is immutable.
+
+### Examples
+
+```java
+String s = "Java";
+s.toUpperCase();
+```
+
+```java
+s.equals("Java");
+```
+
+👉 Always use `equals()` for comparison.
+
+---

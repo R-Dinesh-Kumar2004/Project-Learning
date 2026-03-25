@@ -1,0 +1,32 @@
+Class Assignment:
+
+Implement
+
+
+| Method | Endpoint                | Purpose            |
+| POST   | /api/v1/categories      | Create category    |
+| GET    | /api/v1/products        | Get all products  |
+| GET    | /api/v1/products/{id}   | Get product by ID |
+
+---
+
+Add Category
+------------
+
+Request data
+{
+	"name" : "Apparels",
+	"description" : "Modern fashion for the modern world"
+}
+
+Response data
+
+{
+  "data": {
+	"name": "Apparels",
+	"description": "Modern fashion for the modern world"
+  },
+  "message": "Category Apparels created Successfully",
+  "status": 201,
+  "timestamp": "2026-02-17T15:50:05.9614324"
+}

@@ -1,0 +1,492 @@
+
+# 1. Container Extension Points
+
+Spring allows us to plug into the container lifecycle.
+
+Main extension points:
+
+| Extension Point          | Purpose                                          |
+| ------------------------ | ------------------------------------------------ |
+| BeanPostProcessor        | Modify bean before/after initialization          |
+| BeanFactoryPostProcessor | Modify bean definitions before beans are created |
+| InitializingBean         | Custom initialization logic                      |
+| DisposableBean           | Custom destroy logic                             |
+| ApplicationListener      | Listen to container events                       |
+
+💡 These allow customization without modifying Spring source code.
+
+---
+
+# 2. Bean Scope
+
+## What is Bean Scope?
+
+Scope defines **how many instances** of a bean are created and how long they live.
+
+---
+
+# 3. Singleton, Prototype and Other Scopes
+
+## 🔹 Singleton (Default)
+
+Refer Image: 
+
+* Only ONE object per Spring container
+* Shared across entire application
+
+```java
+@Component
+@Scope("singleton")
+class ServiceBean {}
+```
+
+✔ Default scope
+✔ Created once
+✔ Best for stateless services
+
+---
+
+## 🔹 Prototype
+
+Refer Image: 
+
+```java
+@Component
+@Scope("prototype")
+class ReportBean {}
+```
+
+✔ Multiple instances
+✔ Good for stateful objects
+
+⚠ Spring does NOT manage destroy lifecycle of prototype beans.
+
+---
+
+## 🔹 Other Scopes (Web)
+
+| Scope       | Meaning                     |
+| ----------- | --------------------------- |
+| request     | One bean per HTTP request   |
+| session     | One bean per HTTP session   |
+| application | One bean per ServletContext |
+| websocket   | One bean per WebSocket      |
+
+---
+
+# 4. Significance: Singleton vs Prototype
+
+This is IMPORTANT conceptually.
+
+| Singleton                        | Prototype                         |
+| -------------------------------- | --------------------------------- |
+| One instance                     | New instance every time           |
+| Shared                           | Not shared                        |
+| Container manages full lifecycle | Container does NOT manage destroy |
+| Suitable for stateless           | Suitable for stateful             |
+| Memory efficient                 | More memory usage                 |
+
+### 🔥 Critical Classroom Point
+
+If singleton has state:
+
+```java
+class Counter {
+    int count = 0;
+}
+```
+
+All users share same count.
+
+That is dangerous in multi-threaded apps.
+
+Hence:
+👉 Services → Singleton
+👉 DTO / Temporary objects → Prototype
+
+---
+
+# 5. Configuring Scope
+
+## XML
+
+```xml
+<bean id="myBean" class="com.demo.MyBean" scope="prototype"/>
+```
+
+## Annotation
+
+```java
+@Scope("prototype")
+@Component
+class MyBean {}
+```
+
+---
+
+## What is Bean Lifecycle?
+
+Lifecycle defines:
+
+1. Bean Instantiation
+2. Dependency Injection
+3. Initialization
+4. Ready to Use
+5. Destruction
+
+---
+
+# 6. Bean Lifecycle / Callbacks
+
+Lifecycle Flow:
+
+1. Constructor
+2. Dependency Injection
+3. BeanPostProcessor (before init)
+4. Initialization (init-method/afterPropertiesSet/@PostConstruct)
+5. BeanPostProcessor (after init)
+6. Bean ready
+7. Destroy method (destroy-method/destroy/@PreDestroy)
+
+---
+
+# 7. Example: Database Connection Bean
+
+Let’s take example:
+
+```java
+class DBConnection {
+
+    public void init() {
+        System.out.println("Opening DB connection");
+    }
+
+    public void destroy() {
+        System.out.println("Closing DB connection");
+    }
+}
+```
+
+### What happens?
+
+* init() → open connection
+* destroy() → close connection
+
+This prevents:
+
+* Resource leak
+* Connection not closed
+* Memory leak
+
+---
+
+# 8. BeanPostProcessor Methods
+
+BeanPostProcessor has two important methods:
+
+```java
+postProcessBeforeInitialization()
+postProcessAfterInitialization()
+```
+
+Used to:
+
+* Add proxy (AOP)
+* Modify bean
+* Logging
+* Wrap with transactions
+
+---
+
+# 9. Ways to Configure init and destroy
+
+Now this is very important.
+
+---
+
+## 1. Through Interfaces
+
+### InitializingBean
+
+```java
+class DBConnection implements InitializingBean {
+    public void afterPropertiesSet() {
+        System.out.println("Init logic");
+    }
+}
+```
+
+### DisposableBean
+
+```java
+class DBConnection implements DisposableBean {
+    public void destroy() {
+        System.out.println("Destroy logic");
+    }
+}
+```
+
+### ✅ Pros
+
+* Clear lifecycle control
+* Simple
+
+### ❌ Cons
+
+* Tight coupling with Spring
+* Harder to test outside Spring
+
+---
+
+## 2. init-method and destroy-method (XML)
+
+```xml
+<bean id="db"
+      class="com.demo.DBConnection"
+      init-method="init"
+      destroy-method="destroy"/>
+```
+
+### ✅ Pros
+
+* No Spring dependency in code
+* Clean POJO
+* Decoupled
+
+### ❌ Cons
+
+* XML dependent
+* Old style
+
+---
+
+## 3. @PostConstruct and @PreDestroy
+
+```java
+@PostConstruct
+public void init() {}
+
+@PreDestroy
+public void cleanup() {}
+```
+
+### ✅ Pros
+
+* Clean
+* No Spring-specific interface
+* Annotation-based modern approach
+* Works well in Spring Boot
+
+### ❌ Cons
+
+* Requires JSR annotations dependency
+* Not triggered for prototype destroy
+
+---
+
+# 🔟 Comparison Table
+
+| Method          | Coupled to Spring? | Modern?   | Recommended?  |
+| --------------- | ------------------ | --------- | ------------- |
+| Interface       | Yes                | No        | Not preferred |
+| XML init-method | No                 | Old style | Rare          |
+| @PostConstruct  | No                 | Yes       | Recommended   |
+
+👉 In modern Spring Boot → Use @PostConstruct / @PreDestroy.
+
+---
+
+# 11. Important Notes (Interview Level)
+
+1. Destroy method is NOT called for prototype beans.
+2. Singleton beans destroyed only when container shuts down.
+3. BeanPostProcessor works for all beans.
+4. Scope affects lifecycle behavior.
+
+---
+
+# 1️2. Spring Expression Language (SpEL)
+
+---
+
+# • Introduction to SpEL
+
+Spring Expression Language (SpEL) is a powerful expression language used inside Spring configuration files.
+
+In XML, SpEL is written using:
+
+```
+#{ expression }
+```
+
+It allows us to:
+
+* Access bean properties
+* Call methods
+* Perform arithmetic
+* Apply conditions
+* Access collections
+* Access system properties
+
+👉 Think of it as “dynamic value calculation inside XML”.
+
+---
+
+# • SpEL Features (XML Based)
+
+| Feature         | Example in XML                                |
+| --------------- | --------------------------------------------- |
+| Literal         | `value="#{'Hello'}"`                          |
+| Arithmetic      | `value="#{10 + 20}"`                          |
+| Bean property   | `value="#{person.name}"`                      |
+| Method call     | `value="#{person.getName()}"`                 |
+| Static method   | `value="#{T(java.lang.Math).random()}"`       |
+| Conditional     | `value="#{age > 18 ? 'Adult' : 'Minor'}"`     |
+| System property | `value="#{systemProperties['java.version']}"` |
+
+---
+
+# • SpEL Expression Evaluation Against a Specific Object Instance
+
+In XML configuration, when we write:
+
+```xml
+<property name="name" value="#{person.name}"/>
+```
+
+Spring:
+
+1. Locates bean with id = person
+2. Takes that object instance
+3. Evaluates expression against that object
+4. Injects the result into target bean
+
+So internally:
+SpEL is always evaluated against a real bean instance inside container.
+
+---
+
+# • SpEL in Bean Definition (XML Examples)
+
+Let’s build this step by step.
+
+---
+
+## Example 1: Referencing Another Bean Property
+
+```xml
+<bean id="person" class="com.demo.Person">
+    <property name="name" value="Kaustubh"/>
+</bean>
+
+<bean id="student" class="com.demo.Student">
+    <property name="studentName" value="#{person.name}"/>
+</bean>
+```
+
+Explanation:
+
+* studentName will get value from person.name
+* This is dynamic property resolution
+
+---
+
+## Example 2: Arithmetic Operation
+
+```xml
+<bean id="calculator" class="com.demo.Calculator">
+    <property name="result" value="#{10 * 5}"/>
+</bean>
+```
+
+Spring calculates expression before injecting.
+
+---
+
+## Example 3: Conditional Logic
+
+```xml
+<property name="status"
+          value="#{person.age > 18 ? 'Adult' : 'Minor'}"/>
+```
+
+SpEL supports ternary operator.
+
+---
+
+## Example 4: Static Method Call
+
+```xml
+<property name="randomNumber"
+          value="#{T(java.lang.Math).random()}"/>
+```
+
+`T()` is used to access static methods.
+
+---
+
+## Example 5: Accessing System Properties
+
+```xml
+<property name="javaVersion"
+          value="#{systemProperties['java.version']}"/>
+```
+
+Useful for environment-based configuration.
+
+---
+
+## Example 6: Collection Access
+
+If Person has a list:
+
+```xml
+<property name="firstSubject"
+          value="#{person.subjects[0]}"/>
+```
+
+Accessing index 0.
+
+---
+
+# 🔥 Important Interview-Level Points
+
+1. `#{}` → SpEL expression
+2. `${}` → Property placeholder (external properties file)
+3. SpEL evaluated at runtime.
+4. Can reference beans by id.
+5. Expressions are evaluated by ExpressionParser internally.
+
+---
+
+# 🔥 Difference: ref vs SpEL Bean Reference
+
+Normal reference:
+
+```xml
+<property name="person" ref="person"/>
+```
+
+SpEL reference:
+
+```xml
+<property name="name" value="#{person.name}"/>
+```
+
+👉 `ref` injects full object
+👉 SpEL extracts specific value from object
+
+---
+
+# 🔥 When Should We Use SpEL?
+
+Use SpEL when:
+
+✔ We need computed values
+✔ We need dynamic property resolution
+✔ We need conditional configuration
+✔ We need static method execution
+
+Avoid using it for simple references (use `ref` instead).
+
+---

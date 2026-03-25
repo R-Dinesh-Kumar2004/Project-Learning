@@ -1,0 +1,433 @@
+
+# Spring ORM and Transactions
+
+---
+
+# 1. What is Modern ORM in Spring?
+
+Modern ORM means:
+
+* No `HibernateTemplate`
+* No heavy XML config
+* Using `SessionFactory` directly
+* Using `@Transactional`
+* Annotation-based configuration
+* Clean DAO + Service layering
+
+---
+
+# 2. Compatibility Chart 
+
+| Java   | Spring | Hibernate | Tomcat |
+| ------ | ------ | --------- | ------ |
+|   11   | 5.3.x  | 5.6.x     | 9.0.x  |
+|   17   | 5.3.x  | 5.6.x     | 9.0.x  |
+|   17   | 6.x    | 6.x       | 10.1.x |
+|   25   | 6.x    | 6.x       | 10.1.x |
+
+---
+
+# 3. Quick History of ORM Evolution
+
+## 🔹 Phase 1: Raw JDBC
+
+* Manual connection
+* Manual transaction handling
+* Lots of boilerplate
+
+## 🔹 Phase 2: Hibernate Core
+
+* SessionFactory
+* Session
+* HQL
+* Automatic mapping
+
+## 🔹 Phase 3: Spring + HibernateTemplate
+
+* Introduced by Spring
+* Simplified boilerplate
+* Handled exceptions
+* Wrapped Session usage
+
+Example:
+
+```
+hibernateTemplate.save(entity);
+```
+
+⚠ But it tightly coupled code to Spring ORM.
+
+---
+
+## 🔹 Phase 4: Modern Approach (Current Best Practice)
+
+* Direct `SessionFactory`
+* Spring-managed transactions
+* No template
+* Cleaner separation
+* Closer to Hibernate standard API
+
+Spring 5 → HibernateTemplate deprecated
+Spring 6 → Removed
+
+---
+
+# 4. Important Classes & Interfaces (Modern ORM)
+
+### 🔹 1. SessionFactory
+
+Creates Hibernate Session objects.
+
+Configured using:
+
+```
+LocalSessionFactoryBean
+```
+
+---
+
+### 🔹 2. Session
+
+Represents single unit of work.
+
+Important methods:
+
+* `save()`
+* `persist()`
+* `get()`
+* `load()`
+* `update()`
+* `delete()`
+* `createQuery()`
+
+---
+
+### 🔹 3. LocalSessionFactoryBean
+
+Spring class that:
+
+* Creates SessionFactory
+* Reads DB properties
+* Scans entity packages
+
+---
+
+### 🔹 4. HibernateTransactionManager
+
+Integrates Hibernate with Spring transaction management.
+
+---
+
+### 🔹 5. @Transactional
+
+Most important annotation.
+
+* Opens transaction
+* Commits if success
+* Rolls back if RuntimeException
+
+---
+
+# 5. CRUD on Book
+
+Entity:
+
+```java
+@Entity
+@Table(name = "book_details")
+public class Book { ... }
+```
+
+---
+
+## DAO Layer
+
+```java
+public class BookDaoImpl implements BookDao {
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    private Session getSession() {
+        return sessionFactory.getCurrentSession();
+    }
+
+    public void saveBook(Book book) {
+        getSession().save(book);
+    }
+
+    public Book getBookById(int id) {
+        return getSession().get(Book.class, id);
+    }
+
+    public List<Book> getAllBooks() {
+        return getSession()
+                .createQuery("from Book", Book.class)
+                .list();
+    }
+
+    public void updateBook(Book book) {
+        getSession().update(book);
+    }
+
+    public void deleteBook(int id) {
+        Book book = getBookById(id);
+        getSession().delete(book);
+    }
+}
+```
+
+---
+
+## Service Layer (Transaction Boundary)
+
+```java
+@Service
+@Transactional
+public class BookService {
+
+    @Autowired
+    private BookDao bookDao;
+
+    public void addBook(Book book) {
+        bookDao.saveBook(book);
+    }
+
+    public List<Book> fetchAllBooks() {
+        return bookDao.getAllBooks();
+    }
+}
+```
+
+⚠ Notice:
+We don’t manually begin/commit transaction.
+Spring does it.
+
+# 🧠 Important Conceptual Clarifications
+* Transactions should be applied at **Service layer**, not DAO.
+* DAO should not control transactions.
+
+---
+
+# 6. Transaction Management
+
+When a method annotated with `@Transactional` runs:
+
+1. Spring creates proxy
+2. Opens transaction
+3. Gets Session from SessionFactory
+4. Executes DAO logic
+5. If no exception → commit
+6. If RuntimeException → rollback
+
+---
+
+## Rollback Rules
+
+By default:
+
+* Rolls back on RuntimeException
+* Not on checked exception
+
+Custom rollback:
+
+```java
+@Transactional(rollbackFor = Exception.class)
+```
+
+---
+
+# 7. Java Configuration for Spring ORM (Spring MVC Project)
+
+## Database Configuration
+
+```java
+@Configuration
+@EnableTransactionManagement
+@ComponentScan(basePackages = "com.example")
+public class AppConfig {
+
+    @Bean
+    public DataSource dataSource() {
+        DriverManagerDataSource ds = new DriverManagerDataSource();
+        ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        ds.setUrl("jdbc:mysql://localhost:3306/testdb");
+        ds.setUsername("root");
+        ds.setPassword("password");
+        return ds;
+    }
+
+    @Bean
+    public LocalSessionFactoryBean sessionFactory() {
+        LocalSessionFactoryBean factory =
+                new LocalSessionFactoryBean();
+        factory.setDataSource(dataSource());
+        factory.setPackagesToScan("com.example.entity");
+
+        Properties props = new Properties();
+        props.put("hibernate.dialect",
+                "org.hibernate.dialect.MySQL8Dialect");
+        props.put("hibernate.show_sql", true);
+        props.put("hibernate.hbm2ddl.auto", "update");
+
+        factory.setHibernateProperties(props);
+
+        return factory;
+    }
+
+    @Bean
+    public HibernateTransactionManager transactionManager() {
+        HibernateTransactionManager tx =
+                new HibernateTransactionManager();
+        tx.setSessionFactory(sessionFactory().getObject());
+        return tx;
+    }
+}
+```
+
+---
+
+# 8. Request Flow in Spring MVC + ORM
+
+Controller
+↓
+Service (`@Transactional`)
+↓
+DAO
+↓
+Session
+↓
+Database
+
+Transaction boundary is at Service layer.
+
+---
+
+# 9. Why This Is “Modern”
+
+* No HibernateTemplate
+* Annotation-driven
+* Clean layering
+* Transaction via AOP
+* Uses Hibernate native API
+* Production-style architecture
+
+---
+
+# 10. Spring Transaction Management
+
+---
+
+# • Introduction to Transaction Management
+
+A **Transaction** is a group of operations treated as a single unit of work.
+
+It must follow **ACID**:
+
+| Property    | Meaning                      |
+| ----------- | ---------------------------- |
+| Atomicity   | All or nothing               |
+| Consistency | Data remains valid           |
+| Isolation   | Transactions don’t interfere |
+| Durability  | Committed data stays         |
+
+Example:
+
+Transferring money:
+
+1. Debit from A
+2. Credit to B
+
+If credit fails → debit must rollback.
+
+Without transactions → data corruption.
+
+---
+
+# • Local Transaction vs Distributed Transaction
+
+---
+
+## 🔹 Local Transaction
+
+* Single database
+* Single resource
+* Managed by JDBC or Hibernate
+
+Example:
+
+```
+MySQL only
+```
+
+Uses:
+
+* DataSourceTransactionManager
+
+---
+
+## 🔹 Distributed Transaction
+
+* Multiple resources
+
+  * Two databases
+  * DB + JMS
+  * DB + external system
+* Requires 2-Phase Commit (2PC)
+
+Uses:
+
+* JTA (Java Transaction API)
+* JtaTransactionManager
+
+Example:
+
+```
+MySQL + Oracle
+```
+
+---
+
+### 🔥 Comparison
+
+| Local Transaction | Distributed Transaction |
+| ----------------- | ----------------------- |
+| Single resource   | Multiple resources      |
+| Simple            | Complex                 |
+| Faster            | Slower                  |
+| Most common       | Enterprise-scale apps   |
+
+In most real apps → Local transactions are used.
+
+---
+
+# • Need of Spring Transaction Management
+
+Without Spring:
+
+* Manual commit()
+* Manual rollback()
+* try-catch everywhere
+* Tight coupling
+* Repetitive code
+
+Spring provides:
+
+✔ Declarative transactions
+✔ Automatic commit/rollback
+✔ Clean business logic
+✔ AOP-based transaction handling
+
+---
+
+Spring:
+
+1. Creates proxy
+2. Starts transaction
+3. Executes method
+4. If no exception → commit
+5. If runtime exception → rollback
+
+🔥 No manual commit/rollback required.
+
+---

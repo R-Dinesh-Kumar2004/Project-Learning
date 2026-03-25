@@ -1,0 +1,254 @@
+
+# JSP Action Tags
+
+---
+
+## 1. What are JSP Action Tags?
+
+### Definition
+
+> **JSP Action Tags are special XML-based tags that perform actions at request time.**
+
+They allow JSP pages to:
+
+* include other resources
+* forward requests
+* work with JavaBeans
+* pass parameters
+
+👉 They **execute when the request comes**, not at compile time.
+
+---
+
+## 2. Why JSP Action Tags are Needed
+
+Without action tags:
+
+* JSP contains Java code
+* logic and UI mix
+* code becomes hard to read
+
+With action tags:
+
+* less Java code in JSP
+* cleaner syntax
+* better separation of concerns
+
+---
+
+## 3. Types of JSP Action Tags (Important)
+
+We mainly use these:
+
+1. `<jsp:include>`
+2. `<jsp:forward>`
+3. `<jsp:useBean>`
+4. `<jsp:setProperty>`
+5. `<jsp:getProperty>`
+6. `<jsp:param>`
+
+---
+
+## 4. `<jsp:include>`
+
+### Purpose
+
+> Includes the output of another resource into the current JSP.
+
+### Example
+
+```jsp
+<jsp:include page="header.jsp" />
+```
+
+### Key Points
+
+* Same request
+* Output is **appended**
+* Control returns back
+* Used for reusable UI
+
+### Use Case
+
+✔ header
+✔ footer
+✔ menu
+✔ reusable UI blocks
+
+---
+
+## 5. `<jsp:forward>`
+
+### Purpose
+
+> Forwards the request to another resource and stops current JSP execution.
+
+### Example
+
+```jsp
+<jsp:forward page="result.jsp" />
+```
+
+### Key Points
+
+* Same request
+* Output is **replaced**
+* Control does NOT return
+* Used for navigation
+
+### Use Case
+
+✔ move to result page
+✔ error handling
+✔ flow control
+
+---
+
+## 6. `<jsp:useBean>`
+
+### Purpose
+
+> Creates or locates a JavaBean object.
+
+### Example
+
+```jsp
+<jsp:useBean id="user"
+             class="com.app.model.User"
+             scope="request" />
+```
+
+### How it works
+
+* If bean exists in scope → use it
+* Else → create new object
+
+### Scopes
+
+* page
+* request
+* session
+* application
+
+---
+
+## 7. `<jsp:setProperty>`
+
+### Purpose
+
+> Sets a value into a JavaBean property.
+
+### Example
+
+```jsp
+<jsp:setProperty name="user"
+                 property="name"
+                 value="Rahul" />
+```
+
+### Requirement
+
+* Bean must already exist
+* Setter method must be present
+
+---
+
+## 8. `<jsp:getProperty>`
+
+### Purpose
+
+> Reads a value from a JavaBean property.
+
+### Example
+
+```jsp
+<jsp:getProperty name="user"
+                 property="name" />
+```
+
+### Important Rule (Very Important)
+
+> **Every JSP using `jsp:getProperty` must declare the bean using `jsp:useBean`.**
+
+Even if the bean already exists.
+
+---
+
+## 9. `<jsp:param>`
+
+### Purpose
+
+> Passes request parameters during `include` or `forward`.
+
+### Example
+
+```jsp
+<jsp:include page="header.jsp">
+    <jsp:param name="menu" value="admin" />
+</jsp:include>
+```
+
+### Access in target JSP
+
+```jsp
+${param.menu}
+```
+
+### Use Case
+
+✔ UI control flags
+✔ small messages
+✔ menu selection
+
+---
+
+## 10. Comparison: include vs forward
+
+| Feature         | jsp:include | jsp:forward |
+| --------------- | ----------- | ----------- |
+| Output          | Appended    | Replaced    |
+| Control returns | Yes         | No          |
+| Same request    | Yes         | Yes         |
+| Use case        | Reuse UI    | Navigation  |
+
+---
+
+## 11. JSP Action Tags vs JSTL (Important Insight)
+
+| Feature           | Action Tags | JSTL + EL |
+| ----------------- | ----------- | --------- |
+| JavaBean handling | Yes         | Indirect  |
+| Readability       | Medium      | High      |
+| Modern usage      | Limited     | Preferred |
+| Industry use      | Legacy      | Standard  |
+
+👉 **Action tags are foundational**
+👉 **JSTL + EL is the modern replacement**
+
+---
+
+## 12. Common Mistakes (Warn Students)
+
+❌ Using `jsp:getProperty` without `jsp:useBean`
+❌ Using `jsp:forward` inside included JSP
+❌ Passing large data using `jsp:param`
+❌ Writing business logic in JSP
+
+---
+
+## 13. Memory Rules (Very Strong)
+
+* `include` → reuse UI
+* `forward` → navigation
+* `useBean` → create/find object
+* `setProperty` → write data
+* `getProperty` → read data
+* `param` → small request data
+
+---
+
+## 14. One-Line Summary
+
+> **JSP Action Tags allow JSP pages to include resources, control flow, and work with JavaBeans at request time without writing Java code.**
+
+---

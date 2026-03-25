@@ -1,0 +1,321 @@
+
+# First Dynamic Web Application
+
+---
+
+## 1. What is a Dynamic Web Application?
+
+### Simple Definition
+
+=> A *dynamic web application* generates response *at runtime* using server-side code.
+
+Examples:
+
+* Login page
+* Registration form
+* Interest calculation
+* Database-driven pages
+
+👉 Dynamic = *response depends on input*
+
+---
+
+## 2. Creating the First Dynamic Web Application
+
+### High-Level Steps
+
+1. Create a *Dynamic Web Project*
+2. Add *server runtime*
+3. Create *HTML pages*
+4. Create *Servlet*
+5. Deploy and run on server
+
+👉 Browser alone is not enough — *server is required*
+
+---
+
+## 3. Project Structure (VERY IMPORTANT)
+
+A Java web application follows a *standard structure*.
+
+```
+project-name
+│
+├── src
+│   └── com.company.project
+│       └── servlet
+│           └── LoginServlet.java
+│
+├── src/main/webapp
+│   ├── index.html
+│   ├── login.html
+│   ├── css
+│   │   └── style.css
+│   ├── js
+│   │   └── script.js
+│   └── WEB-INF
+│       └── web.xml
+│
+└── lib
+```
+
+👉 This structure is *not optional* — servers expect it.
+
+---
+
+## 4. Where to Keep Different Files
+
+### 4.1 Java Files
+
+* Location:
+
+```text
+src → package → .java files
+```
+
+Examples:
+
+* Servlets
+* Business logic classes
+
+👉 Java code is *compiled and runs on server*
+
+---
+
+### 4.2 HTML Files
+
+* Location:
+
+```text
+WebContent / webapp
+```
+
+Examples:
+
+* `index.html`
+* `login.html`
+
+👉 Browser directly accesses these files.
+
+---
+
+### 4️.3 CSS Files
+
+* Location:
+
+```text
+WebContent/css
+```
+
+Example:
+
+* `style.css`
+
+👉 Used only for UI styling.
+
+---
+
+### 4️.4 JavaScript Files
+
+* Location:
+
+```text
+WebContent/js
+```
+
+Example:
+
+* `script.js`
+
+👉 Runs on *client side*, not server.
+
+---
+
+## 5. WEB-INF Folder (Protected Area)
+
+### Rule
+
+=> Files inside `WEB-INF` *cannot be accessed directly from browser*.
+
+Contents:
+
+* `web.xml`
+* compiled classes
+* libraries
+
+👉 This protects internal configuration.
+
+---
+
+## 6. What is `web.xml` (Deployment Descriptor)?
+
+### Simple Definition
+
+=> `web.xml` is a configuration file that tells the server *how the web application is structured*.
+
+It contains:
+
+* servlet mappings
+* welcome files
+* filters
+* context parameters
+
+👉 Server *reads this file at startup*
+
+---
+
+## 7. What Happens When We Run (Deploy) an Application?
+
+Let’s go *step by step*, exactly as it happens.
+
+---
+
+## 8. Step-by-Step Deployment Flow (Tomcat)
+
+(Example server: *Apache Tomcat*)
+
+---
+
+### Step 1. Application Deployment
+
+* We run the project on server
+* Application is deployed to Tomcat
+
+---
+
+### Step 2. Tomcat Reads `web.xml`
+
+Tomcat:
+
+* reads `web.xml`
+* loads configuration data
+
+This includes:
+
+* welcome files
+* servlet mappings
+* filters
+* context parameters
+
+---
+
+### Step 3. Welcome File Resolution
+
+Tomcat:
+
+* checks welcome file list
+* finds `index.html` or configured file
+* prepares it for first request
+
+---
+
+### Step 4. URL Pattern Scanning
+
+Tomcat:
+
+* scans all servlet URL mappings
+* builds internal mapping table
+
+Example:
+
+```text
+/login → LoginServlet
+```
+
+👉 This is how Tomcat knows *which servlet to call*
+
+---
+
+### Step 5. Configuration & Context Data
+
+Tomcat:
+
+* reads server config
+* reads application-level parameters
+* prepares shared data
+
+---
+
+### Step 6. ServletContext Creation (Application Level)
+
+### What is ServletContext?
+
+=> An object created by Tomcat *per web application*.
+
+* Created *only once*
+* Shared across all servlets
+* Stores application-wide data
+
+👉 Tomcat:
+
+* creates `ServletContext`
+* fills it with configuration data
+
+---
+
+### Step 7. ServletConfig Creation (Servlet Level)
+
+### What is ServletConfig?
+
+=> An object created *per servlet*.
+
+* Contains servlet-specific data
+* Not shared with other servlets
+
+👉 Tomcat creates:
+
+* one `ServletConfig` per servlet
+* attaches it to servlet instance
+
+---
+
+### Step 8. Registry Maintenance
+
+Tomcat maintains:
+
+* list of servlets
+* URL mappings
+* lifecycle status
+
+👉 This internal registry helps Tomcat route requests quickly.
+
+---
+
+### Step 9. First Request Handling
+
+* Browser sends request `/`
+* Tomcat serves:
+
+  * welcome file (HTML), or
+  * mapped servlet (if configured)
+
+👉 Application is now *live*
+
+---
+
+## 9. One-Line Execution Summary (VERY POWERFUL)
+
+=> *Deploy → Read web.xml → Create context → Create configs → Serve request*
+
+Tell students to *memorize this line*.
+
+---
+
+## 10. Why This Understanding Matters
+
+* Helps debug deployment issues
+* Explains why errors occur at startup
+* Builds confidence with servers
+* Makes Spring lifecycle easier later
+
+---
+
+## Key Takeaways
+
+* Dynamic web apps need a server
+* Project structure is fixed
+* `web.xml` controls configuration
+* Tomcat manages lifecycle
+* ServletContext ≠ ServletConfig
+
+---

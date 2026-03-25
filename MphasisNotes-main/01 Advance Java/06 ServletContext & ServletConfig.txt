@@ -1,0 +1,219 @@
+
+# ServletContext and ServletConfig
+
+---
+
+## 1. Why Do We Need These Objects?
+
+### Problem
+
+In a web application:
+
+=> Some data is *common for the whole application*
+=> Some data is *specific to one servlet*
+
+Java EE solves this using:
+
+=> *ServletContext*
+=> *ServletConfig*
+
+---
+
+## 2. ServletContext
+
+### Simple Definition
+
+> *ServletContext represents the entire web application.*
+
+=> Created *once per application*
+=> Shared by *all servlets*
+=> Created by the server at *application startup*
+
+---
+
+### 2..1 Who Creates ServletContext?
+
+=> Created by the server (example: *Apache Tomcat*)
+=> Created when application is deployed
+=> Destroyed when application is stopped
+
+---
+
+### 2..2 Scope of ServletContext
+
+> *Application-level scope*
+
+Means:
+
+=> One object
+=> Shared data
+=> Same instance for all servlets
+
+---
+
+### 2..3 What Is Stored in ServletContext?
+
+Typically:
+
+=> Application configuration
+=> Shared data
+=> Database configuration
+=> Global counters
+=> Context parameters
+
+---
+
+### 2..4 Context Parameters (web.xml)
+
+Example:
+
+```xml
+<context-param>
+    <param-name>dbName</param-name>
+    <param-value>training_db</param-value>
+</context-param>
+```
+
+Accessing in servlet:
+
+```java
+ServletContext context = getServletContext();
+String dbName = context.getInitParameter("dbName");
+```
+
+---
+
+### 2..5 When to Use ServletContext?
+
+Use ServletContext when:
+
+=> Data is *common for all servlets*
+=> Configuration should be *centralized*
+=> We want *application-wide sharing*
+
+---
+
+## 3. ServletConfig
+
+### Simple Definition
+
+> *ServletConfig represents configuration for one specific servlet.*
+
+=> Created *once per servlet*
+=> Not shared with other servlets
+=> Created when servlet is initialized
+
+---
+
+### 3.1 Who Creates ServletConfig?
+
+=> Created by the server
+=> One `ServletConfig` per servlet
+=> Linked to a specific servlet instance
+
+---
+
+### 3.2 Scope of ServletConfig
+
+> *Servlet-level scope*
+
+Means:
+
+=> Private to that servlet
+=> Other servlets cannot access it
+
+---
+
+### 3.3 ServletConfig Parameters (web.xml)
+
+Example:
+
+```xml
+<servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>com.app.LoginServlet</servlet-class>
+
+    <init-param>
+        <param-name>maxAttempts</param-name>
+        <param-value>3</param-value>
+    </init-param>
+</servlet>
+```
+
+Accessing in servlet:
+
+```java
+ServletConfig config = getServletConfig();
+String max = config.getInitParameter("maxAttempts");
+```
+
+---
+
+### 3..4 When to Use ServletConfig?
+
+Use ServletConfig when:
+
+=> Data is *specific to one servlet*
+=> Configuration should not be shared
+=> Behavior differs per servlet
+
+---
+
+## 4. Lifecycle Relationship (Very Important)
+
+### Creation Order
+
+1. Application is deployed
+2. *ServletContext* is created
+3. Servlet is initialized
+4. *ServletConfig* is created
+5. Requests are served
+
+---
+
+## 5. ServletContext vs ServletConfig (Comparison)
+
+| Feature         | ServletContext       | ServletConfig          |
+| --------------- | -------------------- | ---------------------- |
+| Scope           | Application-wide     | Servlet-specific       |
+| Objects Created | One per application  | One per servlet        |
+| Shared          | Yes (all servlets)   | No                     |
+| Config Location | `<context-param>`    | `<init-param>`         |
+| Lifetime        | App start → App stop | Servlet init → destroy |
+
+---
+
+## 6. One-Line Memory Trick (Tell Them This)
+
+> *ServletContext = Common data*
+> *ServletConfig = Servlet-specific data*
+
+---
+
+## 7. How This Connects to Spring (Tell Them Briefly)
+
+=> ServletContext → Application scope beans
+=> ServletConfig → Bean configuration
+=> Spring *abstracts* these concepts
+
+👉 Understanding this makes Spring much easier.
+
+---
+
+## 8. Common Mistakes Students Make
+
+❌ Using ServletConfig for shared data
+❌ Expecting ServletConfig in other servlets
+❌ Not understanding lifecycle order
+
+---
+
+## Key Takeaways
+
+=> ServletContext is created once
+=> ServletConfig is created per servlet
+=> Both are created by the server
+=> Both are read from `web.xml`
+=> Scope difference is critical
+
+---

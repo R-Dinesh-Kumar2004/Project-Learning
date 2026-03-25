@@ -1,0 +1,175 @@
+
+# Introduction to Java EE (Jakarta EE)
+
+---
+
+## 1. Java Editions Released by Oracle
+
+Java is released in **different editions**, based on application needs.
+
+| Edition | Full Form               | Used For                         |
+| ------- | ----------------------- | -------------------------------- |
+| Java SE | Java Standard Edition   | Core Java, desktop apps, basics  |
+| Java EE | Java Enterprise Edition | Web & enterprise applications    |
+| Java ME | Java Micro Edition      | Mobile & embedded systems        |
+| Java SC | Java Smart Card         | Smart Cards - Credit/Debit Cards |
+
+👉 **We already know Java SE**
+👉 **Now we move to Java EE (Web & Enterprise)**
+
+---
+
+## 2. What is Java EE?
+
+### Simple Definition
+
+> **Java EE is a set of specifications for building large-scale web and enterprise applications.**
+
+Java EE itself is:
+
+* ❌ NOT a software
+* ❌ NOT a framework
+* ✅ A **specification**
+
+---
+
+## 3. Java EE = Specifications + Implementations
+
+### 3.1 What is a Specification?
+
+> A **specification** is a set of rules that describe:
+
+* what components exist
+* what methods they must have
+* how they should behave
+
+Example:
+
+* Servlet specification says:
+
+  * there must be `doGet()`, `doPost()`
+  * container must call them automatically
+
+👉 Specification tells **WHAT should happen**, not **HOW**
+
+---
+
+### 3.2 What is an Implementation?
+
+> An **implementation** is actual software that follows the specification.
+
+Examples:
+
+* Tomcat implements Servlet specification
+* Application servers implement full Java EE specification
+
+👉 Implementation does the **actual work**
+
+---
+
+## 4. Why Java EE is Important
+
+### Problems with only Core Java
+
+* No standard way to handle HTTP requests
+* No standard lifecycle for web components
+* No built-in support for transactions, security, etc.
+
+### What Java EE Provides
+
+* Standard way to build web apps
+* Container-managed lifecycle
+* Reusable, scalable architecture
+* Industry-accepted standards
+
+👉 This is why companies use Java EE–based technologies.
+
+---
+
+## 5. Major Java EE Specifications (High Level)
+
+We will study some of these in this training:
+
+| Specification        | Purpose                        |
+| -------------------- | ------------------------------ |
+| Servlets             | Handle HTTP requests           |
+| JSP                  | Generate dynamic HTML          |
+| JDBC                 | Database access                |
+| JPA                  | ORM (Hibernate implementation) |
+| REST                 | Build APIs                     |
+| Dependency Injection | Object management              |
+
+👉 Spring internally uses many of these ideas.
+
+---
+
+## 6. Who Maintained Java EE Earlier?
+
+Originally:
+
+* Java EE was designed and maintained by **Oracle**
+
+Packages used:
+
+```java
+javax.servlet.*
+javax.persistence.*
+javax.ws.rs.*
+```
+
+---
+
+## 7. Java EE Handed Over to Eclipse Foundation
+
+### What Changed?
+
+* Oracle stopped maintaining Java EE
+* Java EE was donated to Eclipse Foundation
+* Name changed due to legal reasons
+
+---
+
+## 8. Java EE → Jakarta EE (IMPORTANT)
+
+### Name Change
+
+| Old Name | New Name   |
+| -------- | ---------- |
+| Java EE  | Jakarta EE |
+| javax.*  | jakarta.*  |
+
+### Example
+
+Before:
+
+```java
+import javax.servlet.http.HttpServlet;
+```
+
+After:
+
+```java
+import jakarta.servlet.http.HttpServlet;
+```
+
+👉 **Only package names changed**
+👉 **Concepts remain the same**
+
+---
+
+## 9. Why This Change Matters to Us
+
+* Older projects use `javax`
+* New projects use `jakarta`
+* Spring Boot 3+ uses **Jakarta**
+* We must recognize both during learning and interviews
+
+---
+
+## 🔟 One Line Summary for Students
+
+> **Java EE defines rules for enterprise applications.
+> Implementations follow those rules.
+> Today, Java EE is called Jakarta EE.**
+
+---
