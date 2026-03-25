@@ -1,6 +1,6 @@
 package com.demo.MultipleDBConnection.controllers;
 
-import com.demo.MultipleDBConnection.entities.Product;
+import com.demo.MultipleDBConnection.entities.product.Product;
 import com.demo.MultipleDBConnection.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

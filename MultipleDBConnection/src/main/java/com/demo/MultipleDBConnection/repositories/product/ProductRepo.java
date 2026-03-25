@@ -1,6 +1,6 @@
 package com.demo.MultipleDBConnection.repositories.product;
 
-import com.demo.MultipleDBConnection.entities.Product;
+import com.demo.MultipleDBConnection.entities.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

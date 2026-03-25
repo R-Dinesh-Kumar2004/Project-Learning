@@ -1,4 +1,4 @@
-package com.demo.MultipleDBConnection.entities;
+package com.demo.MultipleDBConnection.entities.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,14 +9,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "products")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product {
+public class User {
     @Id
     private int id;
-    @Column(length = 20)
+    @Column(length = 50)
     private String name;
-    private double price;
+    @Column(unique = true,nullable = false)
+    private String email;
 }
