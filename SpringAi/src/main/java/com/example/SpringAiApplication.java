@@ -1,13 +1,13 @@
-package com.demo.MultipleDBConnection;
+package com.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MultipleDbConnectionApplication {
+public class SpringAiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MultipleDbConnectionApplication.class, args);
+		SpringApplication.run(SpringAiApplication.class, args);
 	}
 
 }
